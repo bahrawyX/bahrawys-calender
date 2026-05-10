@@ -10,6 +10,7 @@ import { CATEGORIES } from "../constants";
 import { uid } from "../lib/uid";
 import { timeToMinutes, minutesToTime } from "../utils/dateUtils";
 import { GoogleProviderIcon, OutlookProviderIcon, TrashIcon } from "./icons";
+import { AppleProviderIcon } from "./icons/ProviderIcons";
 import RecurrenceSelector from "./RecurrenceSelector";
 import EditRecurrenceDialog from "./EditRecurrenceDialog";
 
@@ -166,20 +167,24 @@ const EventModal: React.FC = () => {
               {isExternalEvent && (
                 isGoogleEvent
                   ? <GoogleProviderIcon size={16} className="flex-shrink-0" />
-                  : <OutlookProviderIcon size={16} className="flex-shrink-0" />
+                  : isAppleEvent
+                    ? <AppleProviderIcon size={17} className="flex-shrink-0" />
+                    : <OutlookProviderIcon size={16} className="flex-shrink-0" />
               )}
               {isGoogleEvent
                 ? 'Google Calendar Event'
-                : provider === 'microsoft'
-                  ? 'Outlook Event'
-                  : activeEvent
-                    ? 'Edit Event'
-                    : 'Add Event'}
+                : isAppleEvent
+                  ? 'Apple Calendar Event'
+                  : provider === 'microsoft'
+                    ? 'Outlook Event'
+                    : activeEvent
+                      ? 'Edit Event'
+                      : 'Add Event'}
             </DialogTitle>
           </div>
           {isExternalEvent && (
             <p className="text-xs text-muted-foreground mt-1">
-              This event is synced from {isGoogleEvent ? 'Google Calendar' : 'Outlook'} and cannot be edited in Lumina.
+              This event is synced from {isGoogleEvent ? 'Google Calendar' : isAppleEvent ? 'Apple Calendar' : 'Outlook'} and cannot be edited here.
             </p>
           )}
         </DialogHeader>
@@ -229,7 +234,7 @@ const EventModal: React.FC = () => {
             <div className="rounded-lg border border-border/60 bg-muted/30 p-3 space-y-2">
               <div className="flex items-center justify-between gap-2">
                 <span className="text-xs font-medium text-muted-foreground">Synced Source</span>
-                <span className="text-xs font-semibold text-foreground">{isGoogleEvent ? 'Google Calendar' : 'Outlook Calendar'}</span>
+                <span className="text-xs font-semibold text-foreground">{isGoogleEvent ? 'Google Calendar' : isAppleEvent ? 'Apple Calendar' : 'Outlook Calendar'}</span>
               </div>
               <div className="flex items-center justify-between gap-2">
                 <span className="text-xs font-medium text-muted-foreground">Calendar Color</span>
@@ -471,36 +476,41 @@ function MeetingNotesSection({
   };
 
   return (
-    <div className="space-y-1.5">
-      <Label className="text-xs font-medium text-muted-foreground">Meeting notes</Label>
-      {linkedDoc ? (
-        <div className="flex items-center gap-2">
-          <a
-            href={`/docs/${linkedDoc.id}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-primary hover:underline flex items-center gap-1.5"
-          >
-            📋 Open notes →
-          </a>
-          <button
-            type="button"
-            onClick={handleUnlink}
-            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-          >
-            ×
-          </button>
-        </div>
-      ) : (
-        <button
-          type="button"
-          onClick={handleCreateNotes}
-          disabled={isCreating}
-          className="text-sm bg-muted text-muted-foreground px-3 py-1.5 rounded-lg hover:bg-muted/80 transition-colors disabled:opacity-50"
-        >
-          {isCreating ? 'Creating...' : '+ Create notes'}
-        </button>
-      )}
+    <div className="space-y-2">
+      <div className="flex items-center justify-between gap-2">
+        <Label className="text-xs font-medium text-muted-foreground">Meeting notes</Label>
+        {linkedDoc ? (
+          <div className="flex items-center gap-2">
+            <a
+              href={`/docs/${linkedDoc.id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-primary hover:underline flex items-center gap-1.5"
+            >
+              Open notes →
+            </a>
+            <button
+              type="button"
+              onClick={handleUnlink}
+              className="text-[10px] text-muted-foreground hover:text-foreground transition-colors"
+            >
+              ×
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-muted-foreground/60">No notes</span>
+            <button
+              type="button"
+              onClick={handleCreateNotes}
+              disabled={isCreating}
+              className="text-[11px] bg-muted text-muted-foreground px-2 py-1 rounded-md hover:bg-muted/80 transition-colors disabled:opacity-50"
+            >
+              {isCreating ? '...' : '+ Create'}
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

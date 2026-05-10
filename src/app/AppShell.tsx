@@ -276,7 +276,7 @@ const CalendarFiltersDialog: React.FC<{
                 {appleCals.length > 0 && (
                   <div>
                     <div className="flex items-center gap-2 mb-2.5">
-                      <AppleProviderIcon size={14} />
+                      <AppleProviderIcon size={15} />
                       <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
                         Apple Calendar
                       </span>
@@ -912,7 +912,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                       className={`h-8 ${isSidebarCollapsed ? 'justify-center' : ''}`}
                     >
                       <AppleProviderIcon
-                        size={15}
+                        size={17}
                         className="relative z-10 flex-shrink-0"
                       />
                       {!isSidebarCollapsed && (

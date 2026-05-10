@@ -11,6 +11,7 @@ import {
   OutlookProviderIcon,
   RepeatIcon,
 } from './icons';
+import { AppleProviderIcon } from './icons/ProviderIcons';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 
 interface TimeGridEventProps {
@@ -55,7 +56,7 @@ const EventContent = React.memo<{
   isVeryShort: boolean;
   isNarrow: boolean;
   isExternal: boolean;
-  provider: 'local' | 'google' | 'microsoft';
+  provider: 'local' | 'google' | 'microsoft' | 'apple';
   accentColor: string;
   forceInitialsMode: boolean;
   adaptiveTitleCompaction: boolean;
@@ -83,7 +84,9 @@ const EventContent = React.memo<{
           {isExternal && !isVeryShort && (
             provider === 'google'
               ? <GoogleProviderIcon size={isShort ? 10 : 12} className="flex-shrink-0" />
-              : <OutlookProviderIcon size={isShort ? 10 : 12} className="flex-shrink-0 opacity-80" />
+              : provider === 'apple'
+                ? <AppleProviderIcon size={isShort ? 11 : 13} className="flex-shrink-0 opacity-90" />
+                : <OutlookProviderIcon size={isShort ? 10 : 12} className="flex-shrink-0 opacity-80" />
           )}
           {(forceInitialsMode || useCompactTitle) ? (
             <TooltipProvider delayDuration={300}>
@@ -191,16 +194,18 @@ const TimeGridEvent = React.memo<TimeGridEventProps>(({
   const pointerDownPos = React.useRef({ x: 0, y: 0 });
 
   const { top, height } = getEventPosition(event.startTime, event.endTime);
-  const provider: 'local' | 'google' | 'microsoft' =
+  const provider: 'local' | 'google' | 'microsoft' | 'apple' =
     event.provider === 'google' ? 'google'
     : event.provider === 'microsoft' || event.provider === 'outlook' ? 'microsoft'
+    : event.provider === 'apple' ? 'apple'
     : event.source === 'outlook' || event.source === 'microsoft' ? 'microsoft'
     : event.source === 'google' ? 'google'
+    : event.source === 'apple' ? 'apple'
     : 'local';
-  const isExternal = provider === 'microsoft' || provider === 'google';
+  const isExternal = provider === 'microsoft' || provider === 'google' || provider === 'apple';
 
   const color = isExternal
-    ? (event.color || (provider === 'google' ? '#4285F4' : '#0078D4'))
+    ? (event.color || (provider === 'google' ? '#4285F4' : provider === 'apple' ? '#FF3B30' : '#0078D4'))
     : (EVENT_COLORS[event.category] || '#7C5CFC');
 
   const duration = timeToMinutes(event.endTime) - timeToMinutes(event.startTime);

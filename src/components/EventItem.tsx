@@ -4,6 +4,7 @@ import React, { memo } from 'react';
 import { CalendarEvent } from '../types';
 import { EVENT_COLORS } from '../constants';
 import { GoogleProviderIcon, OutlookProviderIcon, RepeatIcon } from './icons';
+import { AppleProviderIcon } from './icons/ProviderIcons';
 
 interface EventItemProps {
   event: CalendarEvent;
@@ -27,19 +28,21 @@ const EventItem = memo<EventItemProps>(({ event, onClick, compact }) => {
       ? 'microsoft'
       : event.source === 'google'
         ? 'google'
-        : 'local');
-  const isExternal = provider === 'microsoft' || provider === 'google';
+        : event.source === 'apple'
+          ? 'apple'
+          : 'local');
+  const isExternal = provider === 'microsoft' || provider === 'google' || provider === 'apple';
   const isRecurring = !!(event.recurrence || event.recurringEventId || event.isRecurrenceException);
 
   const color = isExternal
-    ? (event.color || (provider === 'google' ? '#4285F4' : '#0078D4'))
+    ? (event.color || (provider === 'google' ? '#4285F4' : provider === 'apple' ? '#FF3B30' : '#0078D4'))
     : (EVENT_COLORS[event.category] ?? '#6D59E0');
   const timeLabel = event.startTime ? fmt(event.startTime) : null;
 
   if (compact) {
     return (
       <button
-        draggable={!isExternal}
+        draggable={false}
         onDragStart={(e) => {
           if (isExternal) { e.preventDefault(); return; }
           e.dataTransfer.setData('eventId', event.id);
@@ -48,7 +51,7 @@ const EventItem = memo<EventItemProps>(({ event, onClick, compact }) => {
           e.stopPropagation();
           onClick(event.id);
         }}
-        className={`w-full text-left flex items-center gap-1.5 px-2 py-1 min-[1400px]:gap-2 min-[1400px]:px-2.5 min-[1400px]:py-1.5 rounded-md transition-colors duration-100 group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 ${
+        className={`w-full text-left flex items-center gap-1.5 px-2 py-1.5 min-[1400px]:gap-2 min-[1400px]:px-2.5 min-[1400px]:py-2 rounded-md transition-colors duration-100 group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 ${
           isExternal ? 'cursor-default' : 'cursor-pointer hover:brightness-95'
         }`}
         style={{ backgroundColor: `${color}12`, borderLeft: `2px solid ${color}` }}
@@ -69,7 +72,7 @@ const EventItem = memo<EventItemProps>(({ event, onClick, compact }) => {
 
   return (
     <button
-      draggable={!isExternal}
+      draggable={false}
       onDragStart={(e) => {
         if (isExternal) { e.preventDefault(); return; }
         e.dataTransfer.setData('eventId', event.id);
@@ -78,7 +81,7 @@ const EventItem = memo<EventItemProps>(({ event, onClick, compact }) => {
         e.stopPropagation();
         onClick(event.id);
       }}
-      className={`w-full text-left flex flex-col px-2 py-1.5 rounded-md transition-all duration-[120ms] ease-out group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 ${
+      className={`w-full text-left flex flex-col px-2 py-2 min-[1400px]:py-2.5 rounded-md transition-all duration-[120ms] ease-out group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 ${
         isExternal
           ? 'cursor-default'
           : 'cursor-pointer hover:-translate-y-[1px] hover:shadow-md active:scale-[0.98]'
@@ -103,9 +106,13 @@ const EventItem = memo<EventItemProps>(({ event, onClick, compact }) => {
             className={`flex-shrink-0 ${event.isRecurrenceException ? 'opacity-100' : 'opacity-50'}`}
           />
         )}
-        {isExternal && (provider === 'google'
-          ? <GoogleProviderIcon size={10} className="flex-shrink-0" />
-          : <OutlookProviderIcon size={10} className="flex-shrink-0 opacity-80" />)}
+        {isExternal && (
+          provider === 'google'
+            ? <GoogleProviderIcon size={10} className="flex-shrink-0" />
+            : provider === 'apple'
+              ? <AppleProviderIcon size={11} className="flex-shrink-0 opacity-90" />
+              : <OutlookProviderIcon size={10} className="flex-shrink-0 opacity-80" />
+        )}
         {event.title}
       </span>
       {timeLabel && (
