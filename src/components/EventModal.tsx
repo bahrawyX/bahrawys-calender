@@ -25,9 +25,9 @@ import TimePicker from "./TimePicker";
 import { useDocsStore } from "@/store/useDocsStore";
 import { TEMPLATES } from "@/lib/docs/templates";
 
-/** Intentional brand colors per Google/Microsoft identity guidelines */
-const GOOGLE_BRAND_COLOR = '#4285F4';
-const OUTLOOK_BRAND_COLOR = '#0078D4';
+/** Brand-accent colors used for the tinted external-event cards. */
+const GOOGLE_BRAND_COLOR = '#34A853'; // Google green
+const OUTLOOK_BRAND_COLOR = '#0078D4'; // Outlook blue
 
 /* ── Zod schema ──────────────────────────────────────────────────────────── */
 const eventSchema = z.object({

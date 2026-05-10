@@ -123,7 +123,7 @@ function createGoogleDemoEvents(): CalendarEvent[] {
       timezone: tz,
       location: 'Google Meet',
       category: 'External',
-      color: '#4285F4',
+      color: '#34A853',
       source: 'google',
       provider: 'google',
       readOnly: true,

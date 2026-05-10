@@ -6,8 +6,47 @@ import { EVENT_COLORS } from '../constants';
 import { GoogleProviderIcon, OutlookProviderIcon, RepeatIcon } from './icons';
 import { AppleProviderIcon } from './icons/ProviderIcons';
 
-/** Apple's silver-titanium accent — cool neutral metallic. */
-const APPLE_ACCENT = '#A8A9B0';
+/* ── Provider theming ────────────────────────────────────────────────────────
+ * Each external provider gets a tinted gradient card matching its brand
+ * identity:
+ *   • Apple   → silver-titanium  (#A8A9B0)
+ *   • Google  → brand green      (#34A853)
+ *   • Outlook → brand blue       (#0078D4)
+ *
+ * `iconClassName` only applies to providers whose icon is inline-SVG that
+ * inherits `currentColor` (Apple). Google/Outlook icons are full-color
+ * brand `<img>` SVGs that don't recolor — those leave it empty.
+ */
+type ExternalProvider = 'google' | 'microsoft' | 'apple';
+
+interface ProviderTheme {
+  rgb: string;
+  accent: string;
+  iconClassName: string;
+}
+
+function getProviderTheme(provider: ExternalProvider): ProviderTheme {
+  if (provider === 'apple') {
+    return {
+      rgb: '168,169,176',
+      accent: '#A8A9B0',
+      iconClassName: 'text-[#1d1d1f] dark:text-[#C0C0C0]',
+    };
+  }
+  if (provider === 'google') {
+    return {
+      rgb: '52,168,83',
+      accent: '#34A853',
+      iconClassName: '',
+    };
+  }
+  // microsoft / outlook
+  return {
+    rgb: '0,120,212',
+    accent: '#0078D4',
+    iconClassName: '',
+  };
+}
 
 interface EventItemProps {
   event: CalendarEvent;
@@ -35,32 +74,31 @@ const EventItem = memo<EventItemProps>(({ event, onClick, compact }) => {
           ? 'apple'
           : 'local');
   const isExternal = provider === 'microsoft' || provider === 'google' || provider === 'apple';
-  const isApple = provider === 'apple';
   const isRecurring = !!(event.recurrence || event.recurringEventId || event.isRecurrenceException);
-
-  const color = isApple
-    ? APPLE_ACCENT
-    : isExternal
-      ? (event.color || (provider === 'google' ? '#4285F4' : '#0078D4'))
-      : (EVENT_COLORS[event.category] ?? '#6D59E0');
   const timeLabel = event.startTime ? fmt(event.startTime) : null;
 
-  /* ── Apple compact card ─────────────────────────────────────────── */
-  if (compact && isApple) {
+  /* ── External (Apple / Google / Outlook) — compact card ─────────── */
+  if (compact && isExternal) {
+    const theme = getProviderTheme(provider as ExternalProvider);
+    const ProviderIcon = provider === 'apple'
+      ? AppleProviderIcon
+      : provider === 'google'
+        ? GoogleProviderIcon
+        : OutlookProviderIcon;
     return (
       <button
         draggable={false}
         onClick={(e) => { e.stopPropagation(); onClick(event.id); }}
         className="w-full text-left flex items-center gap-1.5 px-2 py-1.5 min-[1400px]:gap-2 min-[1400px]:px-2.5 min-[1400px]:py-2 rounded-lg cursor-default group focus:outline-none"
         style={{
-          background: 'linear-gradient(135deg, rgba(168,169,176,0.14) 0%, rgba(168,169,176,0.05) 100%)',
-          border: '1px solid rgba(168,169,176,0.22)',
+          background: `linear-gradient(135deg, rgba(${theme.rgb},0.14) 0%, rgba(${theme.rgb},0.05) 100%)`,
+          border: `1px solid rgba(${theme.rgb},0.22)`,
         }}
       >
-        <AppleProviderIcon size={13} className="flex-shrink-0 text-[#1d1d1f] dark:text-[#C0C0C0]" />
+        <ProviderIcon size={13} className={`flex-shrink-0 ${theme.iconClassName}`} />
         <span
           className="truncate text-[11px] min-[1400px]:text-[12px] font-medium leading-none"
-          style={{ color: APPLE_ACCENT }}
+          style={{ color: theme.accent }}
         >
           {event.title}{timeLabel ? ` · ${timeLabel}` : ''}
         </span>
@@ -68,30 +106,42 @@ const EventItem = memo<EventItemProps>(({ event, onClick, compact }) => {
     );
   }
 
-  /* ── Apple normal card ──────────────────────────────────────────── */
-  if (isApple) {
+  /* ── External (Apple / Google / Outlook) — normal card ──────────── */
+  if (isExternal) {
+    const theme = getProviderTheme(provider as ExternalProvider);
+    const ProviderIcon = provider === 'apple'
+      ? AppleProviderIcon
+      : provider === 'google'
+        ? GoogleProviderIcon
+        : OutlookProviderIcon;
     return (
       <button
         draggable={false}
         onClick={(e) => { e.stopPropagation(); onClick(event.id); }}
         className="w-full text-left flex flex-col px-2.5 py-2 min-[1400px]:py-2.5 rounded-lg cursor-default group focus:outline-none"
         style={{
-          background: 'linear-gradient(135deg, rgba(168,169,176,0.14) 0%, rgba(168,169,176,0.05) 100%)',
-          border: '1px solid rgba(168,169,176,0.20)',
-          boxShadow: '0 1px 3px rgba(120,120,128,0.08)',
+          background: `linear-gradient(135deg, rgba(${theme.rgb},0.14) 0%, rgba(${theme.rgb},0.05) 100%)`,
+          border: `1px solid rgba(${theme.rgb},0.20)`,
+          boxShadow: `0 1px 3px rgba(${theme.rgb},0.10)`,
         }}
       >
         <span
           className="truncate text-[11px] font-semibold leading-tight flex items-center gap-1.5"
-          style={{ color: APPLE_ACCENT }}
+          style={{ color: theme.accent }}
         >
-          <AppleProviderIcon size={14} className="flex-shrink-0 text-[#1d1d1f] dark:text-[#C0C0C0]" />
+          <ProviderIcon size={14} className={`flex-shrink-0 ${theme.iconClassName}`} />
+          {isRecurring && (
+            <RepeatIcon
+              size={10}
+              className={`flex-shrink-0 ${event.isRecurrenceException ? 'opacity-100' : 'opacity-50'}`}
+            />
+          )}
           {event.title}
         </span>
         {timeLabel && (
           <span
             className="text-[10px] font-normal leading-tight mt-0.5 tabular-nums"
-            style={{ color: APPLE_ACCENT, opacity: 0.6 }}
+            style={{ color: theme.accent, opacity: 0.65 }}
           >
             {timeLabel}
           </span>
@@ -100,19 +150,16 @@ const EventItem = memo<EventItemProps>(({ event, onClick, compact }) => {
     );
   }
 
-  /* ── Compact (Google / Outlook / Local) ─────────────────────────── */
+  /* ── Local (built-in & custom contexts) ─────────────────────────── */
+  const color = EVENT_COLORS[event.category] ?? '#6D59E0';
+
   if (compact) {
     return (
       <button
-        draggable={!isExternal}
-        onDragStart={(e) => {
-          if (isExternal) { e.preventDefault(); return; }
-          e.dataTransfer.setData('eventId', event.id);
-        }}
+        draggable
+        onDragStart={(e) => { e.dataTransfer.setData('eventId', event.id); }}
         onClick={(e) => { e.stopPropagation(); onClick(event.id); }}
-        className={`w-full text-left flex items-center gap-1.5 px-2 py-1.5 min-[1400px]:gap-2 min-[1400px]:px-2.5 min-[1400px]:py-2 rounded-md transition-colors duration-100 group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 ${
-          isExternal ? 'cursor-default' : 'cursor-pointer hover:brightness-95'
-        }`}
+        className="w-full text-left flex items-center gap-1.5 px-2 py-1.5 min-[1400px]:gap-2 min-[1400px]:px-2.5 min-[1400px]:py-2 rounded-md transition-colors duration-100 group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer hover:brightness-95"
         style={{ backgroundColor: `${color}12`, borderLeft: `2px solid ${color}` }}
       >
         <span
@@ -121,7 +168,7 @@ const EventItem = memo<EventItemProps>(({ event, onClick, compact }) => {
         />
         <span
           className="truncate text-[11px] min-[1400px]:text-[12px] font-medium leading-none"
-          style={{ opacity: event.completed ? 0.45 : 1, color: isExternal ? color : undefined }}
+          style={{ opacity: event.completed ? 0.45 : 1 }}
         >
           {event.title}{timeLabel ? ` · ${timeLabel}` : ''}
         </span>
@@ -129,33 +176,20 @@ const EventItem = memo<EventItemProps>(({ event, onClick, compact }) => {
     );
   }
 
-  /* ── Normal (Google / Outlook / Local) ──────────────────────────── */
   return (
     <button
-      draggable={!isExternal}
-      onDragStart={(e) => {
-        if (isExternal) { e.preventDefault(); return; }
-        e.dataTransfer.setData('eventId', event.id);
-      }}
+      draggable
+      onDragStart={(e) => { e.dataTransfer.setData('eventId', event.id); }}
       onClick={(e) => { e.stopPropagation(); onClick(event.id); }}
-      className={`w-full text-left flex flex-col px-2 py-2 min-[1400px]:py-2.5 rounded-md transition-all duration-[120ms] ease-out group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 ${
-        isExternal
-          ? 'cursor-default'
-          : 'cursor-pointer hover:-translate-y-[1px] hover:shadow-md active:scale-[0.98]'
-      }`}
+      className="w-full text-left flex flex-col px-2 py-2 min-[1400px]:py-2.5 rounded-md transition-all duration-[120ms] ease-out group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer hover:-translate-y-[1px] hover:shadow-md active:scale-[0.98]"
       style={{
         backgroundColor: `${color}12`,
         borderLeft: `2px solid ${color}`,
       }}
     >
       <span
-        className={`truncate text-[11px] font-medium leading-tight group-hover:text-foreground flex items-center gap-1 ${
-          isExternal ? '' : 'text-foreground'
-        }`}
-        style={{
-          opacity: event.completed ? 0.45 : 1,
-          color: isExternal ? color : undefined,
-        }}
+        className="truncate text-[11px] font-medium leading-tight group-hover:text-foreground flex items-center gap-1 text-foreground"
+        style={{ opacity: event.completed ? 0.45 : 1 }}
       >
         {isRecurring && (
           <RepeatIcon
@@ -163,20 +197,10 @@ const EventItem = memo<EventItemProps>(({ event, onClick, compact }) => {
             className={`flex-shrink-0 ${event.isRecurrenceException ? 'opacity-100' : 'opacity-50'}`}
           />
         )}
-        {isExternal && (
-          provider === 'google'
-            ? <GoogleProviderIcon size={10} className="flex-shrink-0" />
-            : <OutlookProviderIcon size={10} className="flex-shrink-0 opacity-80" />
-        )}
         {event.title}
       </span>
       {timeLabel && (
-        <span className={`text-[10px] font-normal leading-tight mt-0.5 tabular-nums ${
-          isExternal ? '' : 'text-muted-foreground'
-        }`} style={{
-          color: isExternal ? color : undefined,
-          opacity: isExternal ? 0.72 : undefined,
-        }}>
+        <span className="text-[10px] font-normal leading-tight mt-0.5 tabular-nums text-muted-foreground">
           {timeLabel}
         </span>
       )}

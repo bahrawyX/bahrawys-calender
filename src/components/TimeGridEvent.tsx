@@ -204,13 +204,26 @@ const TimeGridEvent = React.memo<TimeGridEventProps>(({
     : 'local';
   const isExternal = provider === 'microsoft' || provider === 'google' || provider === 'apple';
 
-  const isApple = provider === 'apple';
   const APPLE_ACCENT = '#A8A9B0';
-  const color = isApple
-    ? APPLE_ACCENT
-    : isExternal
-      ? (event.color || (provider === 'google' ? '#4285F4' : '#0078D4'))
-      : (EVENT_COLORS[event.category] || '#7C5CFC');
+
+  // Provider-specific tint for external events. Each provider gets a tinted
+  // gradient card matching its brand:
+  //   • Apple   → silver-titanium  (168,169,176)
+  //   • Google  → brand green      (52,168,83)
+  //   • Outlook → brand blue       (0,120,212)
+  const externalRgb =
+    provider === 'apple' ? '168,169,176'
+    : provider === 'google' ? '52,168,83'
+    : provider === 'microsoft' ? '0,120,212'
+    : '0,0,0';
+  const externalAccent =
+    provider === 'apple' ? APPLE_ACCENT
+    : provider === 'google' ? '#34A853'
+    : '#0078D4';
+
+  const color = isExternal
+    ? externalAccent
+    : (EVENT_COLORS[event.category] || '#7C5CFC');
 
   const duration = timeToMinutes(event.endTime) - timeToMinutes(event.startTime);
   const isShort = duration < 30;
@@ -252,18 +265,14 @@ const TimeGridEvent = React.memo<TimeGridEventProps>(({
         height: `${height}px`,
         left: `calc(${left} + 5px)`,
         width: `calc(${width} - 10px)`,
-        ...(isApple ? {
-          /* Apple-flavored card: cool silver-titanium gradient, subtle all-around border */
-          background: 'linear-gradient(135deg, rgba(168,169,176,0.16) 0%, rgba(168,169,176,0.06) 100%)',
-          border: '1px solid rgba(168,169,176,0.22)',
-          borderLeft: '3px solid rgba(168,169,176,0.55)',
+        ...(isExternal ? {
+          /* External-provider card: brand-tinted gradient + subtle all-around border. */
+          background: `linear-gradient(135deg, rgba(${externalRgb},0.16) 0%, rgba(${externalRgb},0.06) 100%)`,
+          border: `1px solid rgba(${externalRgb},0.22)`,
+          borderLeft: `3px solid rgba(${externalRgb},0.55)`,
         } : {
-          backgroundColor: isExternal
-            ? `${color}14`
-            : `${color}${isSelected ? '1c' : '10'}`,
-          borderLeft: isExternal
-            ? `3.5px solid ${color}`
-            : `3px solid ${color}${isSelected ? 'cc' : '70'}`,
+          backgroundColor: `${color}${isSelected ? '1c' : '10'}`,
+          borderLeft: `3px solid ${color}${isSelected ? 'cc' : '70'}`,
           borderTop: `1px solid ${color}12`,
           borderRight: `1px solid ${color}08`,
           borderBottom: `1px solid ${color}08`,
@@ -273,8 +282,8 @@ const TimeGridEvent = React.memo<TimeGridEventProps>(({
         boxSizing: 'border-box',
         opacity: isDraggedOrigin ? 0.35 : isGhost ? 0.28 : isDimmed ? 0.68 : 1,
         filter: isDraggedOrigin ? 'saturate(0)' : 'saturate(1)',
-        boxShadow: isDraggedOrigin || isGhost ? 'none' : isApple
-          ? '0 1px 4px rgba(120,120,128,0.10), 0 0 0 0.5px rgba(168,169,176,0.08)'
+        boxShadow: isDraggedOrigin || isGhost ? 'none' : isExternal
+          ? `0 1px 4px rgba(${externalRgb},0.12), 0 0 0 0.5px rgba(${externalRgb},0.08)`
           : isSelected
             ? `0 4px 18px ${color}30, 0 1px 4px ${color}1a`
             : '0 1px 3px rgba(0,0,0,0.06)',
