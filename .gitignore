@@ -1,0 +1,10 @@
+node_modules
+.next
+out
+dist
+*.log
+.env*
+!.env.example
+.vscode
+.DS_Store
+next-env.d.ts

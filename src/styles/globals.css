@@ -1,0 +1,141 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Shadcn CSS variables ────────────────────────────────────────────────── */
+@layer base {
+  :root {
+    /* Light mode */
+    --background:   0 0% 100%;
+    --foreground:   222 47% 11%;
+    --card:         0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover:      0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary:      249 66% 61%;          /* #6D59E0 */
+    --primary-foreground: 0 0% 100%;
+    --secondary:    240 4% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted:        240 5% 96%;
+    --muted-foreground: 215 16% 47%;
+    --accent:       249 66% 95%;
+    --accent-foreground: 249 66% 35%;
+    --destructive:  0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border:       220 13% 91%;
+    --input:        220 13% 91%;
+    --ring:         249 66% 61%;
+    --radius:       0.5rem;
+  }
+
+  .dark {
+    --background:   240 9% 9%;            /* #15151D neutral-panel */
+    --foreground:   0 0% 96%;
+    --card:         240 8% 10%;
+    --card-foreground: 0 0% 96%;
+    --popover:      240 8% 12%;
+    --popover-foreground: 0 0% 96%;
+    --primary:      249 66% 61%;
+    --primary-foreground: 0 0% 100%;
+    --secondary:    240 6% 14%;
+    --secondary-foreground: 0 0% 96%;
+    --muted:        240 5% 15%;
+    --muted-foreground: 215 16% 57%;
+    --accent:       249 30% 22%;
+    --accent-foreground: 249 66% 80%;
+    --destructive:  0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border:       240 6% 18%;           /* neutral-border */
+    --input:        240 6% 18%;
+    --ring:         249 66% 61%;
+  }
+}
+
+/* ─── Base resets ─────────────────────────────────────────────────────────── */
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.015em;
+  }
+}
+
+/* ─── Custom fonts ────────────────────────────────────────────────────────── */
+@font-face {
+  font-family: 'ClashGrotesk-Variable';
+  src: url('/ClashGrotesk_Complete/Fonts/WEB/fonts/ClashGrotesk-Variable.woff2') format('woff2'),
+       url('/ClashGrotesk_Complete/Fonts/WEB/fonts/ClashGrotesk-Variable.woff') format('woff'),
+       url('/ClashGrotesk_Complete/Fonts/WEB/fonts/ClashGrotesk-Variable.ttf') format('truetype');
+  font-weight: 200 700;
+  font-display: swap;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'ClashDisplay-Variable';
+  src: url('/ClashDisplay_Complete/Fonts/WEB/fonts/ClashDisplay-Variable.woff2') format('woff2'),
+       url('/ClashDisplay_Complete/Fonts/WEB/fonts/ClashDisplay-Variable.woff') format('woff'),
+       url('/ClashDisplay_Complete/Fonts/WEB/fonts/ClashDisplay-Variable.ttf') format('truetype');
+  font-weight: 200 700;
+  font-display: swap;
+  font-style: normal;
+}
+
+/* ─── CSS custom properties (non-Tailwind) ────────────────────────────────── */
+:root {
+  --font-display: 'ClashGrotesk-Variable', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --hover-badge-text:   #6D59E0;
+  --hover-badge-bg:     rgba(255,255,255,0.97);
+  --hover-badge-border: rgba(109,89,224,0.35);
+  --hover-line-bg:      rgba(109,89,224,0.60);
+}
+
+.dark {
+  --hover-badge-text:   #a294f0;
+  --hover-badge-bg:     rgba(21,21,29,0.97);
+  --hover-badge-border: rgba(162,148,240,0.40);
+  --hover-line-bg:      rgba(162,148,240,0.65);
+}
+
+/* ─── Theme transitions ───────────────────────────────────────────────────── */
+*, *::before, *::after {
+  transition: background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              color 0.25s ease-out;
+}
+
+/* ─── Scrollbar hide utility ─────────────────────────────────────────────── */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ─── iOS/Android safe-area helpers ─────────────────────────────────────── */
+.pt-safe { padding-top: env(safe-area-inset-top); }
+.pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+
+/* ─── Thin scrollbar (time picker columns) ───────────────────────────────── */
+.thin-scrollbar { scrollbar-width: thin; scrollbar-color: rgba(120,120,140,0.35) transparent; }
+.thin-scrollbar::-webkit-scrollbar { width: 4px; }
+.thin-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.thin-scrollbar::-webkit-scrollbar-thumb { background: rgba(120,120,140,0.35); border-radius: 9999px; }
+
+/* ─── Glass modal surface ─────────────────────────────────────────────────── */
+.glass-modal {
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+}
+.dark .glass-modal {
+  background: rgba(21,21,29,0.92);
+  backdrop-filter: blur(16px) saturate(160%);
+}
+
+/* ─── Selection ───────────────────────────────────────────────────────────── */
+::selection {
+  background-color: rgba(109,89,224,0.1);
+  color: #6D59E0;
+}

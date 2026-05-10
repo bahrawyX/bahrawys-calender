@@ -1,0 +1,832 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Shadcn CSS variables ────────────────────────────────────────────────── */
+@layer base {
+  :root {
+    /* ── Light: "paper" — warm, crafted, high-contrast ─────────────────── */
+    --background:   36 28% 97%;           /* warm paper, slightly more saturated warmth */
+    --foreground:   222 30% 12%;          /* warm ink, not pure black */
+    --card:         40 30% 99%;           /* softer than pure white, subtle warmth */
+    --card-foreground: 222 30% 12%;
+    --popover:      40 30% 99%;
+    --popover-foreground: 222 30% 12%;
+    --primary:      249 66% 61%;          /* #6D59E0 — preserved brand color */
+    --primary-foreground: 40 30% 99%;
+    --secondary:    36 18% 93%;           /* warm-tinted neutral */
+    --secondary-foreground: 222 30% 12%;
+    --muted:        36 18% 94%;           /* warm-tinted muted */
+    --muted-foreground: 222 12% 42%;      /* warmer grey */
+    --accent:       249 66% 95%;
+    --accent-foreground: 249 66% 35%;
+    --destructive:  350 70% 55%;
+    --destructive-foreground: 40 30% 99%;
+    --border:       30 15% 84%;           /* warm-tinted border */
+    --input:        30 15% 84%;
+    --ring:         249 66% 61%;
+    --radius:       0.5rem;
+  }
+
+  .dark {
+    /* ── Dark: "ink" — warmer depth, not cold charcoal ─────────────────── */
+    --background:   240 8% 8%;            /* slight cool tilt but darker */
+    --foreground:   36 20% 96%;           /* warm off-white ink */
+    --card:         240 7% 10%;
+    --card-foreground: 36 20% 96%;
+    --popover:      240 7% 12%;
+    --popover-foreground: 36 20% 96%;
+    --primary:      249 66% 64%;          /* slightly brighter in dark */
+    --primary-foreground: 0 0% 100%;
+    --secondary:    240 5% 14%;
+    --secondary-foreground: 36 20% 96%;
+    --muted:        240 5% 14%;
+    --muted-foreground: 36 8% 62%;        /* warmer dark-mode muted */
+    --accent:       249 30% 22%;
+    --accent-foreground: 249 66% 80%;
+    --destructive:  350 65% 58%;
+    --destructive-foreground: 0 0% 100%;
+    --border:       240 5% 18%;
+    --input:        240 5% 18%;
+    --ring:         249 66% 64%;
+  }
+}
+
+/* ─── Base resets ─────────────────────────────────────────────────────────── */
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  /* Kill all focus outlines / rings globally — the app is pointer-first.
+     Keyboard users still get the browser's native :focus-visible outline
+     if they explicitly navigate via Tab, but the Tailwind ring system
+     (focus-visible:ring-*) is wiped so nothing glows purple on click. */
+  *:focus {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  *:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+    ring: 0 !important;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.011em;
+    font-feature-settings: 'ss01', 'cv11';  /* Geist stylistic tweaks */
+    position: relative;
+  }
+
+  /* Subtle grain overlay — fixed to viewport, pointer-events none,
+     adds paper-like texture in light mode and atmospheric depth in dark.
+     Uses a data-URI SVG so there's no HTTP request. */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    mix-blend-mode: multiply;
+  }
+  .dark body::before {
+    opacity: 0.045;
+    mix-blend-mode: screen;
+  }
+
+  /* Display headings — Clash Display reserved for key hierarchy moments */
+  h1, h2, .font-display {
+    letter-spacing: -0.025em;
+  }
+}
+
+/* ─── Custom fonts ────────────────────────────────────────────────────────── */
+@font-face {
+  font-family: 'ClashGrotesk-Variable';
+  src: url('/ClashGrotesk_Complete/Fonts/WEB/fonts/ClashGrotesk-Variable.woff2') format('woff2'),
+       url('/ClashGrotesk_Complete/Fonts/WEB/fonts/ClashGrotesk-Variable.woff') format('woff'),
+       url('/ClashGrotesk_Complete/Fonts/WEB/fonts/ClashGrotesk-Variable.ttf') format('truetype');
+  font-weight: 200 700;
+  font-display: swap;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'ClashDisplay-Variable';
+  src: url('/ClashDisplay_Complete/Fonts/WEB/fonts/ClashDisplay-Variable.woff2') format('woff2'),
+       url('/ClashDisplay_Complete/Fonts/WEB/fonts/ClashDisplay-Variable.woff') format('woff'),
+       url('/ClashDisplay_Complete/Fonts/WEB/fonts/ClashDisplay-Variable.ttf') format('truetype');
+  font-weight: 200 700;
+  font-display: swap;
+  font-style: normal;
+}
+
+/* ─── CSS custom properties (non-Tailwind) ────────────────────────────────── */
+:root {
+  --font-display: 'ClashDisplay-Variable', 'ClashGrotesk-Variable', sans-serif;
+  --font-body: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --hover-badge-text:   #6D59E0;
+  --hover-badge-bg:     rgba(255,255,255,0.97);
+  --hover-badge-border: rgba(109,89,224,0.35);
+  --hover-line-bg:      rgba(109,89,224,0.60);
+}
+
+.dark {
+  --hover-badge-text:   #a294f0;
+  --hover-badge-bg:     rgba(21,21,29,0.97);
+  --hover-badge-border: rgba(162,148,240,0.40);
+  --hover-line-bg:      rgba(162,148,240,0.65);
+}
+
+/* ─── App shell fade-in (avoids hydration mismatch from motion.div) ──────── */
+@keyframes appShellFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ─── Empty state float animation ─────────────────────────────────────────── */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-4px); }
+}
+
+/* ─── Theme transitions ───────────────────────────────────────────────────── */
+/* Only animate bg/border/color when the THEME CLASS toggles on <html>.
+   The previous `*, *::before, *::after` rule applied a 400ms transition
+   to every element on every mount — so newly-rendered route content
+   visually faded-in its background colors over 400ms, causing a
+   sluggish "lag" feel on route changes. Scoping to `.dark *` and
+   `:root *` with a class change on <html> means the transition only
+   fires when next-themes toggles light ↔ dark. */
+html.transitioning-theme *,
+html.transitioning-theme *::before,
+html.transitioning-theme *::after {
+  transition: background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              color 0.25s ease-out;
+}
+
+/* ─── Scrollbar hide utility ─────────────────────────────────────────────── */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ─── Mobile input zoom prevention (P0) ──────────────────────────────────── */
+/* iOS Safari and Android Chrome auto-zoom inputs whose computed font-size
+   is < 16px. That zoom is disruptive on mobile — it locks the viewport and
+   forces the user to pinch-out afterwards. We force the minimum on small
+   viewports only so desktop typography is untouched. */
+@media (max-width: 768px) {
+  input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='color']),
+  textarea,
+  select {
+    font-size: 16px;
+  }
+}
+
+/* ─── Boneyard skeleton content wrapper ──────────────────────────────────── */
+/* The boneyard <Skeleton> component wraps children in a plain <div> that
+   breaks flex height chains. Make it inherit flex layout from its parent. */
+[data-boneyard-content="true"] {
+  flex: 1 1 0%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* ─── Signature card motion ────────────────────────────────────────────────
+   Shared hover treatment across all "card" surfaces. Produces a subtle
+   lift: shadow deepens, border warms toward foreground, translate -1px.
+   Apply alongside base border/bg classes for consistent feel. */
+.card-lift {
+  box-shadow: 0 1px 2px rgba(17,17,28,0.03), 0 1px 3px -1px rgba(17,17,28,0.02);
+  transition:
+    transform     0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow    0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color  0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+.card-lift:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px -4px rgba(17,17,28,0.07), 0 2px 6px -2px rgba(17,17,28,0.04);
+  border-color: hsl(var(--foreground) / 0.14);
+}
+.dark .card-lift {
+  box-shadow: 0 1px 2px rgba(0,0,0,0.25), 0 1px 3px -1px rgba(0,0,0,0.18);
+}
+.dark .card-lift:hover {
+  box-shadow: 0 6px 16px -4px rgba(0,0,0,0.45), 0 2px 6px -2px rgba(0,0,0,0.28);
+  border-color: hsl(var(--foreground) / 0.22);
+}
+/* Focus-visible parity — keyboard users get the same depth cue */
+.card-lift:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px -4px rgba(17,17,28,0.07), 0 2px 6px -2px rgba(17,17,28,0.04);
+  border-color: hsl(var(--foreground) / 0.18);
+}
+.dark .card-lift:focus-visible {
+  box-shadow: 0 6px 16px -4px rgba(0,0,0,0.45), 0 2px 6px -2px rgba(0,0,0,0.28);
+  border-color: hsl(var(--foreground) / 0.26);
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-lift, .card-lift:hover, .card-lift:focus-visible {
+    transform: none;
+    transition: box-shadow 0.15s ease-out, border-color 0.15s ease-out;
+  }
+}
+
+/* ─── iOS/Android safe-area helpers ─────────────────────────────────────── */
+.pt-safe { padding-top: env(safe-area-inset-top); }
+.pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+
+/* ─── PWA standalone mode (iOS/Android) ────────────────────────────────── */
+@supports (display-mode: standalone) {
+  @media (display-mode: standalone) {
+    html {
+      overscroll-behavior-y: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    body {
+      /* Prevent pull-to-refresh on iOS standalone */
+      overscroll-behavior-y: none;
+      /* Account for notch / dynamic island */
+      padding-top: env(safe-area-inset-top);
+    }
+  }
+}
+
+/* iOS rubber-band overscroll prevention in PWA mode */
+@media screen and (display-mode: standalone) {
+  html, body {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  #__next, [data-nextjs-scroll-focus-boundary] {
+    height: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* ─── Thin scrollbar (time picker columns) ───────────────────────────────── */
+.thin-scrollbar { scrollbar-width: thin; scrollbar-color: rgba(120,120,140,0.35) transparent; }
+.thin-scrollbar::-webkit-scrollbar { width: 4px; }
+.thin-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.thin-scrollbar::-webkit-scrollbar-thumb { background: rgba(120,120,140,0.35); border-radius: 9999px; }
+
+/* ─── Modal scrollbar (smooth, themed, hover-revealed) ────────────────────── */
+.modal-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--border) / 0.6) transparent;
+}
+.modal-scroll::-webkit-scrollbar { width: 6px; }
+.modal-scroll::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 8px 0;
+}
+.modal-scroll::-webkit-scrollbar-thumb {
+  background: hsl(var(--border) / 0.5);
+  border-radius: 9999px;
+  transition: background 0.2s ease;
+}
+.modal-scroll::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--border) / 0.85);
+}
+.modal-scroll::-webkit-scrollbar-thumb:active {
+  background: hsl(var(--primary) / 0.6);
+}
+
+/* ─── Glass modal surface ─────────────────────────────────────────────────── */
+.glass-modal {
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+}
+.dark .glass-modal {
+  background: rgba(21,21,29,0.92);
+  backdrop-filter: blur(16px) saturate(160%);
+}
+
+/* ─── Selection — use browser defaults ────────────────────────────────────── */
+
+
+/* ─────────────────────────────────────────────────────────
+   TIPTAP EDITOR — Lumina doc editor styles.
+   ───────────────────────────────────────────────────────── */
+
+/* Outer wrapper */
+.lumina-editor {
+  scroll-behavior: smooth;
+  position: relative;
+}
+
+/* ProseMirror contenteditable root */
+.lumina-editor .ProseMirror {
+  outline: none;
+  min-height: 50vh;
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 1.75;
+  color: hsl(var(--foreground));
+  caret-color: hsl(var(--primary));
+  padding: 0 0 6rem;
+  word-break: break-word;
+}
+
+/* Headings — Clash Display for H1/H2 (matches Lumina design system) */
+.lumina-editor .ProseMirror h1 {
+  font-family: 'Clash Display', 'Clash Grotesk', sans-serif;
+  font-size: 2rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  margin: 2rem 0 0.5rem;
+  color: hsl(var(--foreground));
+}
+.lumina-editor .ProseMirror h2 {
+  font-family: 'Clash Display', 'Clash Grotesk', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.3;
+  margin: 1.75rem 0 0.4rem;
+  color: hsl(var(--foreground));
+}
+.lumina-editor .ProseMirror h3 {
+  font-family: inherit;
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.4;
+  margin: 1.5rem 0 0.3rem;
+  color: hsl(var(--foreground));
+}
+.lumina-editor .ProseMirror > :first-child {
+  margin-top: 0;
+}
+
+/* Paragraph */
+.lumina-editor .ProseMirror p {
+  margin: 0.3rem 0;
+}
+
+/* Placeholder (Tiptap Placeholder extension adds .is-empty + data-placeholder) */
+.lumina-editor .ProseMirror .is-empty::before {
+  content: attr(data-placeholder);
+  color: hsl(var(--muted-foreground) / 0.6);
+  pointer-events: none;
+  float: left;
+  height: 0;
+  font-style: italic;
+}
+
+/* Blockquote */
+.lumina-editor .ProseMirror blockquote {
+  border-left: 3px solid hsl(var(--border));
+  padding-left: 1rem;
+  margin: 1rem 0;
+  color: hsl(var(--muted-foreground));
+  font-style: italic;
+}
+
+/* Inline code */
+.lumina-editor .ProseMirror code {
+  font-family: 'Geist Mono', ui-monospace, monospace;
+  font-size: 0.875em;
+  background: hsl(var(--muted));
+  border-radius: 4px;
+  padding: 0.1em 0.35em;
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* Code block */
+.lumina-editor .ProseMirror pre {
+  font-family: 'Geist Mono', ui-monospace, monospace;
+  font-size: 0.875rem;
+  background: hsl(var(--muted));
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin: 1rem 0;
+  overflow-x: auto;
+  tab-size: 2;
+}
+.lumina-editor .ProseMirror pre code {
+  background: none;
+  border-radius: 0;
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
+}
+.lumina-editor .ProseMirror pre::-webkit-scrollbar {
+  height: 4px;
+}
+.lumina-editor .ProseMirror pre::-webkit-scrollbar-track {
+  background: transparent;
+}
+.lumina-editor .ProseMirror pre::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 2px;
+}
+
+/* Lists */
+.lumina-editor .ProseMirror ul,
+.lumina-editor .ProseMirror ol {
+  padding-left: 1.5rem;
+  margin: 0.5rem 0;
+}
+.lumina-editor .ProseMirror li {
+  margin: 0.2rem 0;
+}
+.lumina-editor .ProseMirror li p {
+  margin: 0;
+}
+
+/* Native task list (Tiptap TaskList — distinct from the custom taskBlock in Phase 3) */
+.lumina-editor .ProseMirror ul[data-type="taskList"] {
+  list-style: none;
+  padding-left: 0.25rem;
+}
+.lumina-editor .ProseMirror ul[data-type="taskList"] li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+.lumina-editor .ProseMirror ul[data-type="taskList"] li > label {
+  display: flex;
+  align-items: center;
+  margin-top: 3px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.lumina-editor .ProseMirror ul[data-type="taskList"] li > label input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  accent-color: hsl(var(--primary));
+  cursor: pointer;
+}
+.lumina-editor .ProseMirror ul[data-type="taskList"] li > div {
+  flex: 1;
+  min-width: 0;
+}
+.lumina-editor .ProseMirror ul[data-type="taskList"] li[data-checked="true"] > div {
+  text-decoration: line-through;
+  color: hsl(var(--muted-foreground));
+}
+
+/* Horizontal rule */
+.lumina-editor .ProseMirror hr {
+  border: none;
+  border-top: 1px solid hsl(var(--border));
+  margin: 2rem 0;
+}
+
+/* Links */
+.lumina-editor .ProseMirror a {
+  color: hsl(var(--primary));
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  transition: opacity 0.1s;
+  cursor: pointer;
+}
+.lumina-editor .ProseMirror a:hover {
+  opacity: 0.8;
+}
+
+/* Highlight */
+.lumina-editor .ProseMirror mark {
+  background: hsl(var(--primary) / 0.15);
+  border-radius: 2px;
+  padding: 0.05em 0.15em;
+  color: inherit;
+}
+
+/* Images */
+.lumina-editor .ProseMirror img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 0.75rem 0;
+  display: block;
+}
+.lumina-editor .ProseMirror img.ProseMirror-selectednode {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
+/* Selection */
+.lumina-editor .ProseMirror ::selection {
+  background: hsl(var(--primary) / 0.18);
+}
+
+/* Block-in animation. Phase 5 will mark new blocks with [data-new-block]
+   via MutationObserver; for now the keyframe is defined and unused so
+   nothing animates on initial load (matches "existing blocks don't slide
+   on first paint"). */
+@keyframes lumina-block-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.lumina-editor.editor-loaded .ProseMirror > [data-new-block] {
+  animation: lumina-block-in 0.15s ease-out both;
+}
+
+/* Drag handle (Tiptap DragHandle React wrapper applies .drag-handle to outer) */
+.drag-handle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  color: hsl(var(--muted-foreground));
+  opacity: 0;
+  transition: opacity 0.15s, background-color 0.1s;
+  cursor: grab;
+}
+.drag-handle-btn:hover {
+  opacity: 1 !important;
+  background: hsl(var(--muted));
+}
+.drag-handle-btn:active {
+  cursor: grabbing;
+}
+.lumina-editor:hover .drag-handle-btn {
+  opacity: 0.4;
+}
+
+/* Task Block (custom Lumina node — added Phase 3) */
+.lumina-editor .task-block-wrapper {
+  margin: 0.35rem 0;
+}
+.lumina-editor .ProseMirror > .task-block-wrapper:first-child {
+  margin-top: 0;
+}
+
+/* Columns layout (custom — added Phase 4 since Tiptap Pro extension is paid) */
+.lumina-editor .ProseMirror [data-type="columns"] {
+  display: flex;
+  gap: 1rem;
+  margin: 0.75rem 0;
+}
+.lumina-editor .ProseMirror [data-type="column"] {
+  /* flex-grow value comes from the inline style set by ColumnExtension's
+     renderHTML — keep this rule as a fallback for any rendered HTML that
+     was serialised without the inline style. */
+  min-width: 0;
+}
+@media (max-width: 768px) {
+  .lumina-editor .ProseMirror [data-type="columns"] {
+    flex-direction: column;
+  }
+}
+.lumina-editor .ProseMirror [data-type="column"].ProseMirror-selectednode {
+  outline: 1px solid hsl(var(--border));
+  border-radius: 4px;
+}
+
+/* Slash menu (Phase 4): kill tippy's default frame so SlashMenuList's own
+   bg-popover/border/shadow are what the user sees. */
+.tippy-box[data-theme~='lumina-slash'] {
+  background: transparent;
+  border: none;
+  padding: 0;
+  box-shadow: none;
+}
+.tippy-box[data-theme~='lumina-slash'] > .tippy-content {
+  padding: 0;
+}
+.tippy-box[data-theme~='lumina-slash'] > .tippy-arrow {
+  display: none;
+}
+
+/* Code Block NodeView (Phase 5) — overrides the simpler pre styles above */
+.lumina-editor .code-block-wrapper {
+  margin: 1rem 0;
+}
+.lumina-editor .code-block-pre {
+  font-family: 'Geist Mono', ui-monospace, monospace;
+  font-size: 0.875rem;
+  background: hsl(var(--muted));
+  border-radius: 8px;
+  /* extra top padding so the language selector + copy button don't overlap code */
+  padding: 2.25rem 1.25rem 1.25rem;
+  margin: 0;
+  overflow-x: auto;
+  tab-size: 2;
+  line-height: 1.6;
+}
+.lumina-editor .code-block-pre::-webkit-scrollbar {
+  height: 3px;
+}
+.lumina-editor .code-block-pre::-webkit-scrollbar-track {
+  background: transparent;
+}
+.lumina-editor .code-block-pre::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 2px;
+}
+
+/* Lowlight syntax highlighting — colors via HSL so they adapt to theme */
+.lumina-editor .hljs-keyword,
+.lumina-editor .hljs-operator {
+  color: hsl(var(--primary));
+}
+.lumina-editor .hljs-string,
+.lumina-editor .hljs-attr {
+  color: hsl(142 70% 45%);
+}
+.lumina-editor .hljs-number,
+.lumina-editor .hljs-literal {
+  color: hsl(25 90% 55%);
+}
+.lumina-editor .hljs-comment,
+.lumina-editor .hljs-quote {
+  color: hsl(var(--muted-foreground));
+  font-style: italic;
+}
+.lumina-editor .hljs-title,
+.lumina-editor .hljs-built_in {
+  color: hsl(220 80% 60%);
+}
+.lumina-editor .hljs-variable,
+.lumina-editor .hljs-name {
+  color: hsl(var(--foreground));
+}
+
+/* Focus mode (Phase 5) — dim non-active top-level blocks. The
+   .is-focused-block class is set in DocEditor's selectionUpdate listener. */
+.lumina-editor.focus-mode-active .ProseMirror > * {
+  opacity: 0.4;
+  transition: opacity 0.15s ease;
+}
+.lumina-editor.focus-mode-active .ProseMirror > .is-focused-block {
+  opacity: 1;
+}
+/* When the editor isn't focused (user clicked outside), restore everything
+   so the page doesn't look "broken" without an active block. */
+.lumina-editor.focus-mode-active .ProseMirror:not(:focus-within) > * {
+  opacity: 1;
+}
+
+/* Mobile (Phase 5) — 16px font prevents iOS auto-zoom on input focus,
+   extra bottom padding leaves room for the virtual keyboard, drag handle
+   hidden because touch drag-reorder is unreliable. */
+@media (max-width: 640px) {
+  .lumina-editor .ProseMirror {
+    font-size: 16px;
+    padding-bottom: 40vh;
+  }
+  .drag-handle-btn {
+    display: none;
+  }
+}
+
+/* Table (Phase 6) */
+.lumina-editor .ProseMirror table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+  margin: 1rem 0;
+  overflow: hidden;
+  border-radius: 6px;
+}
+.lumina-editor .ProseMirror th,
+.lumina-editor .ProseMirror td {
+  min-width: 100px;
+  padding: 0.5rem 0.75rem;
+  vertical-align: top;
+  border: 1px solid hsl(var(--border));
+  position: relative;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.lumina-editor .ProseMirror th {
+  font-weight: 500;
+  background: hsl(var(--muted));
+  text-align: left;
+}
+.lumina-editor .ProseMirror .selectedCell {
+  background: hsl(var(--primary) / 0.08);
+}
+.lumina-editor .ProseMirror .column-resize-handle {
+  position: absolute;
+  right: -2px;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: hsl(var(--primary) / 0.4);
+  cursor: col-resize;
+  pointer-events: all;
+}
+.lumina-editor .ProseMirror .tableWrapper {
+  overflow-x: auto;
+}
+.lumina-editor .ProseMirror.resize-cursor {
+  cursor: col-resize;
+}
+
+/* Toggle / collapsible block (Phase 6) — most styling lives in the
+   ToggleNodeView component; this just covers the wrapper spacing and
+   makes sure ProseMirror's <details> default browser styling doesn't
+   leak through. */
+.lumina-editor .ProseMirror details[data-type="toggle"] {
+  margin: 0.35rem 0;
+}
+.lumina-editor .ProseMirror details[data-type="toggle"] > summary {
+  display: none;
+}
+
+/* Bookmark card (Phase 6) — most styling lives in BookmarkNodeView;
+   .bookmark-wrapper just lets us target the NodeViewWrapper spacing. */
+.lumina-editor .bookmark-wrapper {
+  margin: 0.5rem 0;
+}
+
+/* Math block (Phase 6) — KaTeX rendering produces a centered display.
+   Add a small surrounding spacing to match other block elements. */
+.lumina-editor .ProseMirror .Tiptap-mathematics-render {
+  display: block;
+  text-align: center;
+  margin: 1rem 0;
+  padding: 0.75rem;
+  border-radius: 6px;
+  background: hsl(var(--muted) / 0.5);
+}
+.lumina-editor .ProseMirror .Tiptap-mathematics-render--editable {
+  cursor: pointer;
+}
+.lumina-editor .ProseMirror .Tiptap-mathematics-render:hover {
+  background: hsl(var(--muted));
+}
+
+/* End TIPTAP EDITOR section */
+
+/* ─────────────────────────────────────────────────────────
+   QUICK CAPTURE — global modal triggered by Q
+   ───────────────────────────────────────────────────────── */
+
+/* Subtle outer ring on the active type pill — keeps the active state
+   readable in both light and dark themes without overpowering the card. */
+.qc-pill-active {
+  box-shadow: 0 0 0 1px hsl(var(--primary) / 0.3);
+}
+
+/* Backdrop blur — Safari still wants the -webkit prefix for backdrop-filter. */
+.qc-backdrop {
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+/* Caret in the capture input. */
+.qc-input {
+  caret-color: hsl(var(--primary));
+}
+
+/* Smooth height transitions for the conditional context row. */
+.qc-context-row {
+  overflow: hidden;
+}
+
+/* End QUICK CAPTURE section */
+
+/* ─────────────────────────────────────────────────────────
+   CALENDAR — horizontal-scroll affordances
+   ───────────────────────────────────────────────────────── */
+
+/* Thin, theme-coloured scrollbar so the calendar's overflow-x feels native
+   instead of bolting a chunky default scrollbar onto the editorial chrome. */
+.calendar-scroll-container::-webkit-scrollbar { height: 3px; }
+.calendar-scroll-container::-webkit-scrollbar-track { background: transparent; }
+.calendar-scroll-container::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 2px;
+}
+.calendar-scroll-container {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--border)) transparent;
+}
+
+/* End CALENDAR section */
+
+/* ── Feature showcase ───────────────────────────────────── */
+/*
+ * The feature showcase uses a vertical-scroll-drives-horizontal-translation
+ * pattern implemented entirely in `FeatureShowcase.tsx` via framer-motion's
+ * `useScroll` + `useSpring`. No bespoke snap CSS required — the section
+ * itself gets a "ghost" spacer equal to the horizontal track's scrollWidth,
+ * and a sticky inner wrapper pins the viewport during traversal.
+ */
