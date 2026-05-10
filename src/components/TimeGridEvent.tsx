@@ -30,6 +30,22 @@ interface TimeGridEventProps {
   onPointerDown?: (e: React.PointerEvent<HTMLDivElement>) => void;
 }
 
+/**
+ * Parse `#rrggbb` / `#rgb` into an `r,g,b` triplet for `rgba(...)`. Returns
+ * null for non-hex colors so the caller can fall back to a flat tint.
+ */
+function hexToRgb(hex: string): string | null {
+  if (!hex || hex[0] !== '#') return null;
+  let cleaned = hex.slice(1);
+  if (cleaned.length === 3) cleaned = cleaned.split('').map((c) => c + c).join('');
+  if (cleaned.length !== 6) return null;
+  const r = parseInt(cleaned.slice(0, 2), 16);
+  const g = parseInt(cleaned.slice(2, 4), 16);
+  const b = parseInt(cleaned.slice(4, 6), 16);
+  if (Number.isNaN(r) || Number.isNaN(g) || Number.isNaN(b)) return null;
+  return `${r},${g},${b}`;
+}
+
 function getEventInitials(title: string): string {
   const cleanedWords = title
     .trim()
@@ -93,10 +109,8 @@ const EventContent = React.memo<{
               <Tooltip>
                 <TooltipTrigger asChild>
                   <h4
-                    className={`font-bold leading-tight overflow-hidden ${
-                      isExternal ? '' : 'text-foreground'
-                    } ${isVeryShort ? 'text-[8px]' : isShort ? 'text-[9px]' : 'text-[11px]'}`}
-                    style={{ color: isExternal ? accentColor : undefined }}
+                    className={`font-bold leading-tight overflow-hidden ${isVeryShort ? 'text-[8px]' : isShort ? 'text-[9px]' : 'text-[11px]'}`}
+                    style={{ color: accentColor }}
                   >
                     {displayTitle}
                   </h4>
@@ -126,12 +140,10 @@ const EventContent = React.memo<{
 
       {/* Start time — always shown unless the card is too tiny to fit a second line */}
       {!isVeryShort && (
-        <div className="flex items-center gap-1.5 opacity-60">
-          <span className={`font-bold leading-none ${
-            isExternal ? '' : 'text-muted-foreground'
-          } ${(isShort || forceInitialsMode) ? 'text-[8px]' : 'text-[9px]'}`} style={{
-            color: isExternal ? accentColor : undefined,
-            opacity: isExternal ? 0.75 : undefined,
+        <div className="flex items-center gap-1.5">
+          <span className={`font-bold leading-none ${(isShort || forceInitialsMode) ? 'text-[8px]' : 'text-[9px]'}`} style={{
+            color: accentColor,
+            opacity: 0.7,
           }}>
             {formatTime(event.startTime)}
           </span>
@@ -223,7 +235,12 @@ const TimeGridEvent = React.memo<TimeGridEventProps>(({
 
   const color = isExternal
     ? externalAccent
-    : (EVENT_COLORS[event.category] || '#7C5CFC');
+    : (event.color || EVENT_COLORS[event.category] || '#7C5CFC');
+
+  // Convert the local event's hex color into an RGB triplet so we can apply
+  // the same gradient/border treatment used by external providers. Falls
+  // back to null if the color isn't hex (e.g. a legacy hsl() fallback).
+  const localRgb = !isExternal ? hexToRgb(color) : null;
 
   const duration = timeToMinutes(event.endTime) - timeToMinutes(event.startTime);
   const isShort = duration < 30;
@@ -270,7 +287,16 @@ const TimeGridEvent = React.memo<TimeGridEventProps>(({
           background: `linear-gradient(135deg, rgba(${externalRgb},0.16) 0%, rgba(${externalRgb},0.06) 100%)`,
           border: `1px solid rgba(${externalRgb},0.22)`,
           borderLeft: `3px solid rgba(${externalRgb},0.55)`,
+        } : localRgb ? {
+          /* Local event w/ hex color: same gradient language, tinted with
+             the category color so user-defined contexts (e.g. Critical=red)
+             read as that color throughout the card, not just on the rail. */
+          background: `linear-gradient(135deg, rgba(${localRgb},0.16) 0%, rgba(${localRgb},0.06) 100%)`,
+          border: `1px solid rgba(${localRgb},0.22)`,
+          borderLeft: `3px solid rgba(${localRgb},${isSelected ? 0.85 : 0.6})`,
         } : {
+          /* Legacy fallback for events whose stored color isn't hex
+             (e.g. old hsl() values). Keeps the original flat tint. */
           backgroundColor: `${color}${isSelected ? '1c' : '10'}`,
           borderLeft: `3px solid ${color}${isSelected ? 'cc' : '70'}`,
           borderTop: `1px solid ${color}12`,
@@ -284,9 +310,13 @@ const TimeGridEvent = React.memo<TimeGridEventProps>(({
         filter: isDraggedOrigin ? 'saturate(0)' : 'saturate(1)',
         boxShadow: isDraggedOrigin || isGhost ? 'none' : isExternal
           ? `0 1px 4px rgba(${externalRgb},0.12), 0 0 0 0.5px rgba(${externalRgb},0.08)`
-          : isSelected
-            ? `0 4px 18px ${color}30, 0 1px 4px ${color}1a`
-            : '0 1px 3px rgba(0,0,0,0.06)',
+          : localRgb
+            ? (isSelected
+                ? `0 4px 18px rgba(${localRgb},0.22), 0 1px 4px rgba(${localRgb},0.14)`
+                : `0 1px 3px rgba(${localRgb},0.10)`)
+            : isSelected
+              ? `0 4px 18px ${color}30, 0 1px 4px ${color}1a`
+              : '0 1px 3px rgba(0,0,0,0.06)',
         willChange: isDraggedOrigin ? 'transform' : undefined,
         contain: 'layout style paint',
         transition: isDraggedOrigin ? 'none' : 'opacity 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease, transform 0.12s ease-out',

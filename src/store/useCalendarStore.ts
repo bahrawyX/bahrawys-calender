@@ -124,34 +124,35 @@ function getGoals(profile: UserProfile): UserGoal[] {
 }
 
 /**
- * Push the current custom-categories list to the DB. On failure, run the
- * rollback so the store reverts to the prior state and a toast can fire.
- * Used by add/update/delete category actions to keep UI optimistic while
- * remaining DB-as-source-of-truth.
+ * Persist the current custom-categories list to localStorage.
+ *
+ * Standalone calendar — no DB backend, so the previous Lumina implementation
+ * (which PATCHed `/api/users/preferences`) was rolling back on every save
+ * because that endpoint doesn't exist here. Now we write the list to
+ * `lumina_custom_categories` synchronously; the rollback is unused but kept
+ * in the signature to preserve the existing call sites.
  */
+const CUSTOM_CATEGORIES_KEY = 'lumina_custom_categories';
+
 function persistCustomCategories(
   list: Array<{ name: string; color: string }>,
-  rollback: () => void,
+  _rollback: () => void,
 ): void {
-  if (typeof window === 'undefined') return;
-  void fetch('/api/users/preferences', {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ customCategories: list }),
-  })
-    .then((res) => { if (!res.ok) rollback(); })
-    .catch(() => rollback());
+  setStorageItem(CUSTOM_CATEGORIES_KEY, JSON.stringify(list));
 }
 
 export const useCalendarStore = create<CalendarState>((set, get) => ({
   activeFilters: [],
   searchQuery: '',
   timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-  // DB is the source of truth — start empty and hydrate from
-  // /api/users/preferences via PersistenceBootstrap. No localStorage read here
-  // so the previous user's contexts cannot leak into a new session.
-  customCategories: [],
-  customCategoriesHydrated: false,
+  // Standalone calendar: rehydrate user-defined contexts straight from
+  // localStorage on store creation. Synchronous because Zustand needs an
+  // initial state object before any async hydration could complete.
+  customCategories: readStorageJSON<Array<{ name: string; color: string }>>(
+    CUSTOM_CATEGORIES_KEY,
+    [],
+  ),
+  customCategoriesHydrated: true,
   // Profile is in-memory only. The previous `lumina_profile` cache leaked
   // identity (name/email/bio) and stale intelligence numbers across logouts.
   // Intelligence is recomputed from events; user identity comes from auth.

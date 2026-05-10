@@ -48,6 +48,24 @@ function getProviderTheme(provider: ExternalProvider): ProviderTheme {
   };
 }
 
+/**
+ * Parse a `#rrggbb` / `#rgb` hex string into an `r,g,b` triplet for use in
+ * `rgba(...)` declarations. Returns null for non-hex colors (e.g. the
+ * `hsl(var(--primary))` fallback used when a category lookup fails) so the
+ * caller can fall back to a flat tint.
+ */
+function hexToRgb(hex: string): string | null {
+  if (!hex || hex[0] !== '#') return null;
+  let cleaned = hex.slice(1);
+  if (cleaned.length === 3) cleaned = cleaned.split('').map((c) => c + c).join('');
+  if (cleaned.length !== 6) return null;
+  const r = parseInt(cleaned.slice(0, 2), 16);
+  const g = parseInt(cleaned.slice(2, 4), 16);
+  const b = parseInt(cleaned.slice(4, 6), 16);
+  if (Number.isNaN(r) || Number.isNaN(g) || Number.isNaN(b)) return null;
+  return `${r},${g},${b}`;
+}
+
 interface EventItemProps {
   event: CalendarEvent;
   onClick: (id: string) => void;
@@ -151,7 +169,27 @@ const EventItem = memo<EventItemProps>(({ event, onClick, compact }) => {
   }
 
   /* ── Local (built-in & custom contexts) ─────────────────────────── */
-  const color = EVENT_COLORS[event.category] ?? '#6D59E0';
+  // Prefer the event's stored color (filled in by EventModal at save time so
+  // custom-context events keep their picked color), falling back to the
+  // built-in category map.
+  const color = event.color || EVENT_COLORS[event.category] || '#6D59E0';
+  const rgb = hexToRgb(color);
+
+  // Match the provider-card visual language: gradient background + thin
+  // all-around border + 3px accented left rail. Falls back gracefully when
+  // the color isn't a hex string (e.g. an old event saved with the hsl()
+  // primary fallback).
+  const localCardStyle: React.CSSProperties = rgb
+    ? {
+        background: `linear-gradient(135deg, rgba(${rgb},0.14) 0%, rgba(${rgb},0.05) 100%)`,
+        border: `1px solid rgba(${rgb},0.22)`,
+        borderLeft: `3px solid rgba(${rgb},0.55)`,
+        boxShadow: `0 1px 3px rgba(${rgb},0.08)`,
+      }
+    : {
+        backgroundColor: `${color}12`,
+        borderLeft: `2px solid ${color}`,
+      };
 
   if (compact) {
     return (
@@ -159,16 +197,16 @@ const EventItem = memo<EventItemProps>(({ event, onClick, compact }) => {
         draggable
         onDragStart={(e) => { e.dataTransfer.setData('eventId', event.id); }}
         onClick={(e) => { e.stopPropagation(); onClick(event.id); }}
-        className="w-full text-left flex items-center gap-1.5 px-2 py-1.5 min-[1400px]:gap-2 min-[1400px]:px-2.5 min-[1400px]:py-2 rounded-md transition-colors duration-100 group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer hover:brightness-95"
-        style={{ backgroundColor: `${color}12`, borderLeft: `2px solid ${color}` }}
+        className="w-full text-left flex items-center gap-1.5 px-2 py-1.5 min-[1400px]:gap-2 min-[1400px]:px-2.5 min-[1400px]:py-2 rounded-lg transition-all duration-100 group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer hover:-translate-y-[1px]"
+        style={localCardStyle}
       >
         <span
           className="w-1.5 h-1.5 min-[1400px]:w-2 min-[1400px]:h-2 rounded-full flex-shrink-0"
           style={{ backgroundColor: color }}
         />
         <span
-          className="truncate text-[11px] min-[1400px]:text-[12px] font-medium leading-none"
-          style={{ opacity: event.completed ? 0.45 : 1 }}
+          className="truncate text-[11px] min-[1400px]:text-[12px] font-semibold leading-none"
+          style={{ color, opacity: event.completed ? 0.45 : 1 }}
         >
           {event.title}{timeLabel ? ` · ${timeLabel}` : ''}
         </span>
@@ -181,15 +219,12 @@ const EventItem = memo<EventItemProps>(({ event, onClick, compact }) => {
       draggable
       onDragStart={(e) => { e.dataTransfer.setData('eventId', event.id); }}
       onClick={(e) => { e.stopPropagation(); onClick(event.id); }}
-      className="w-full text-left flex flex-col px-2 py-2 min-[1400px]:py-2.5 rounded-md transition-all duration-[120ms] ease-out group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer hover:-translate-y-[1px] hover:shadow-md active:scale-[0.98]"
-      style={{
-        backgroundColor: `${color}12`,
-        borderLeft: `2px solid ${color}`,
-      }}
+      className="w-full text-left flex flex-col px-2.5 py-2 min-[1400px]:py-2.5 rounded-lg transition-all duration-[120ms] ease-out group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer hover:-translate-y-[1px] hover:shadow-md active:scale-[0.98]"
+      style={localCardStyle}
     >
       <span
-        className="truncate text-[11px] font-medium leading-tight group-hover:text-foreground flex items-center gap-1 text-foreground"
-        style={{ opacity: event.completed ? 0.45 : 1 }}
+        className="truncate text-[11px] font-semibold leading-tight flex items-center gap-1.5"
+        style={{ color, opacity: event.completed ? 0.45 : 1 }}
       >
         {isRecurring && (
           <RepeatIcon
@@ -200,7 +235,10 @@ const EventItem = memo<EventItemProps>(({ event, onClick, compact }) => {
         {event.title}
       </span>
       {timeLabel && (
-        <span className="text-[10px] font-normal leading-tight mt-0.5 tabular-nums text-muted-foreground">
+        <span
+          className="text-[10px] font-normal leading-tight mt-0.5 tabular-nums"
+          style={{ color, opacity: 0.65 }}
+        >
           {timeLabel}
         </span>
       )}

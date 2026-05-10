@@ -57,6 +57,11 @@ const EventModal: React.FC = () => {
   const updateEvent = useCalendarEventsStore(s => s.updateEvent);
   const deleteEvent = useCalendarEventsStore(s => s.deleteEvent);
   const localEvent = events.find((e) => e.id === selectedEventId);
+  const customCategories = useCalendarStore(s => s.customCategories);
+  const allCategories = React.useMemo(
+    () => [...CATEGORIES, ...customCategories],
+    [customCategories]
+  );
   const outlookEvents = usePlannerStore((s) => s.outlookEvents);
   const googleEvents = usePlannerStore((s) => s.googleEvents);
   const appleEvents = usePlannerStore((s) => s.appleEvents);
@@ -139,7 +144,7 @@ const EventModal: React.FC = () => {
       endTime: result.data.endTime,
       category: result.data.category as EventCategory,
       location: formData.location || "",
-      color: CATEGORIES.find((c) => c.name === result.data.category)?.color || 'hsl(var(--primary))',
+      color: allCategories.find((c) => c.name === result.data.category)?.color || 'hsl(var(--primary))',
       timezone: localEvent?.timezone || timezone,
       recurrence: recurrence ?? undefined,
     };
@@ -318,14 +323,14 @@ const EventModal: React.FC = () => {
                   <span className="flex items-center gap-2">
                     <span
                       className="w-2.5 h-2.5 rounded-full shrink-0"
-                      style={{ backgroundColor: CATEGORIES.find((c) => c.name === formData.category)?.color || 'hsl(var(--primary))' }}
+                      style={{ backgroundColor: allCategories.find((c) => c.name === formData.category)?.color || 'hsl(var(--primary))' }}
                     />
                     {formData.category}
                   </span>
                 </SelectValue>
               </SelectTrigger>
               <SelectContent>
-                {CATEGORIES.map((cat) => (
+                {allCategories.map((cat) => (
                   <SelectItem key={cat.name} value={cat.name}>
                     <span className="flex items-center gap-2">
                       <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: cat.color }} />
