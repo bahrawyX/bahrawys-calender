@@ -6,6 +6,9 @@ import { EVENT_COLORS } from '../constants';
 import { GoogleProviderIcon, OutlookProviderIcon, RepeatIcon } from './icons';
 import { AppleProviderIcon } from './icons/ProviderIcons';
 
+/** Apple's warm champagne-titanium accent. */
+const APPLE_ACCENT = '#A2845E';
+
 interface EventItemProps {
   event: CalendarEvent;
   onClick: (id: string) => void;
@@ -32,25 +35,81 @@ const EventItem = memo<EventItemProps>(({ event, onClick, compact }) => {
           ? 'apple'
           : 'local');
   const isExternal = provider === 'microsoft' || provider === 'google' || provider === 'apple';
+  const isApple = provider === 'apple';
   const isRecurring = !!(event.recurrence || event.recurringEventId || event.isRecurrenceException);
 
-  const color = isExternal
-    ? (event.color || (provider === 'google' ? '#4285F4' : provider === 'apple' ? '#FF3B30' : '#0078D4'))
-    : (EVENT_COLORS[event.category] ?? '#6D59E0');
+  const color = isApple
+    ? APPLE_ACCENT
+    : isExternal
+      ? (event.color || (provider === 'google' ? '#4285F4' : '#0078D4'))
+      : (EVENT_COLORS[event.category] ?? '#6D59E0');
   const timeLabel = event.startTime ? fmt(event.startTime) : null;
 
-  if (compact) {
+  /* ── Apple compact card ─────────────────────────────────────────── */
+  if (compact && isApple) {
     return (
       <button
         draggable={false}
+        onClick={(e) => { e.stopPropagation(); onClick(event.id); }}
+        className="w-full text-left flex items-center gap-1.5 px-2 py-1.5 min-[1400px]:gap-2 min-[1400px]:px-2.5 min-[1400px]:py-2 rounded-lg cursor-default group focus:outline-none"
+        style={{
+          background: 'linear-gradient(135deg, rgba(162,132,94,0.10) 0%, rgba(162,132,94,0.04) 100%)',
+          border: '1px solid rgba(162,132,94,0.18)',
+        }}
+      >
+        <AppleProviderIcon size={10} className="flex-shrink-0 opacity-60" />
+        <span
+          className="truncate text-[11px] min-[1400px]:text-[12px] font-medium leading-none"
+          style={{ color: APPLE_ACCENT }}
+        >
+          {event.title}{timeLabel ? ` · ${timeLabel}` : ''}
+        </span>
+      </button>
+    );
+  }
+
+  /* ── Apple normal card ──────────────────────────────────────────── */
+  if (isApple) {
+    return (
+      <button
+        draggable={false}
+        onClick={(e) => { e.stopPropagation(); onClick(event.id); }}
+        className="w-full text-left flex flex-col px-2.5 py-2 min-[1400px]:py-2.5 rounded-lg cursor-default group focus:outline-none"
+        style={{
+          background: 'linear-gradient(135deg, rgba(162,132,94,0.10) 0%, rgba(162,132,94,0.04) 100%)',
+          border: '1px solid rgba(162,132,94,0.15)',
+          boxShadow: '0 1px 3px rgba(162,132,94,0.06)',
+        }}
+      >
+        <span
+          className="truncate text-[11px] font-semibold leading-tight flex items-center gap-1.5"
+          style={{ color: APPLE_ACCENT }}
+        >
+          <AppleProviderIcon size={11} className="flex-shrink-0 opacity-70" />
+          {event.title}
+        </span>
+        {timeLabel && (
+          <span
+            className="text-[10px] font-normal leading-tight mt-0.5 tabular-nums"
+            style={{ color: APPLE_ACCENT, opacity: 0.6 }}
+          >
+            {timeLabel}
+          </span>
+        )}
+      </button>
+    );
+  }
+
+  /* ── Compact (Google / Outlook / Local) ─────────────────────────── */
+  if (compact) {
+    return (
+      <button
+        draggable={!isExternal}
         onDragStart={(e) => {
           if (isExternal) { e.preventDefault(); return; }
           e.dataTransfer.setData('eventId', event.id);
         }}
-        onClick={(e) => {
-          e.stopPropagation();
-          onClick(event.id);
-        }}
+        onClick={(e) => { e.stopPropagation(); onClick(event.id); }}
         className={`w-full text-left flex items-center gap-1.5 px-2 py-1.5 min-[1400px]:gap-2 min-[1400px]:px-2.5 min-[1400px]:py-2 rounded-md transition-colors duration-100 group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 ${
           isExternal ? 'cursor-default' : 'cursor-pointer hover:brightness-95'
         }`}
@@ -70,17 +129,15 @@ const EventItem = memo<EventItemProps>(({ event, onClick, compact }) => {
     );
   }
 
+  /* ── Normal (Google / Outlook / Local) ──────────────────────────── */
   return (
     <button
-      draggable={false}
+      draggable={!isExternal}
       onDragStart={(e) => {
         if (isExternal) { e.preventDefault(); return; }
         e.dataTransfer.setData('eventId', event.id);
       }}
-      onClick={(e) => {
-        e.stopPropagation();
-        onClick(event.id);
-      }}
+      onClick={(e) => { e.stopPropagation(); onClick(event.id); }}
       className={`w-full text-left flex flex-col px-2 py-2 min-[1400px]:py-2.5 rounded-md transition-all duration-[120ms] ease-out group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 ${
         isExternal
           ? 'cursor-default'
@@ -109,9 +166,7 @@ const EventItem = memo<EventItemProps>(({ event, onClick, compact }) => {
         {isExternal && (
           provider === 'google'
             ? <GoogleProviderIcon size={10} className="flex-shrink-0" />
-            : provider === 'apple'
-              ? <AppleProviderIcon size={11} className="flex-shrink-0 opacity-90" />
-              : <OutlookProviderIcon size={10} className="flex-shrink-0 opacity-80" />
+            : <OutlookProviderIcon size={10} className="flex-shrink-0 opacity-80" />
         )}
         {event.title}
       </span>

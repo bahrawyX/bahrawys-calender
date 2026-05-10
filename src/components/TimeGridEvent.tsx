@@ -204,9 +204,13 @@ const TimeGridEvent = React.memo<TimeGridEventProps>(({
     : 'local';
   const isExternal = provider === 'microsoft' || provider === 'google' || provider === 'apple';
 
-  const color = isExternal
-    ? (event.color || (provider === 'google' ? '#4285F4' : provider === 'apple' ? '#FF3B30' : '#0078D4'))
-    : (EVENT_COLORS[event.category] || '#7C5CFC');
+  const isApple = provider === 'apple';
+  const APPLE_ACCENT = '#A2845E';
+  const color = isApple
+    ? APPLE_ACCENT
+    : isExternal
+      ? (event.color || (provider === 'google' ? '#4285F4' : '#0078D4'))
+      : (EVENT_COLORS[event.category] || '#7C5CFC');
 
   const duration = timeToMinutes(event.endTime) - timeToMinutes(event.startTime);
   const isShort = duration < 30;
@@ -248,23 +252,32 @@ const TimeGridEvent = React.memo<TimeGridEventProps>(({
         height: `${height}px`,
         left: `calc(${left} + 5px)`,
         width: `calc(${width} - 10px)`,
-        backgroundColor: isExternal
-          ? `${color}14`
-          : `${color}${isSelected ? '1c' : '10'}`,
-        borderLeft: isExternal
-          ? `3.5px solid ${color}`
-          : `3px solid ${color}${isSelected ? 'cc' : '70'}`,
-        borderTop: `1px solid ${color}12`,
-        borderRight: `1px solid ${color}08`,
-        borderBottom: `1px solid ${color}08`,
+        ...(isApple ? {
+          /* Apple-flavored card: warm champagne gradient, subtle all-around border */
+          background: 'linear-gradient(135deg, rgba(162,132,94,0.12) 0%, rgba(162,132,94,0.05) 100%)',
+          border: '1px solid rgba(162,132,94,0.18)',
+          borderLeft: '3px solid rgba(162,132,94,0.50)',
+        } : {
+          backgroundColor: isExternal
+            ? `${color}14`
+            : `${color}${isSelected ? '1c' : '10'}`,
+          borderLeft: isExternal
+            ? `3.5px solid ${color}`
+            : `3px solid ${color}${isSelected ? 'cc' : '70'}`,
+          borderTop: `1px solid ${color}12`,
+          borderRight: `1px solid ${color}08`,
+          borderBottom: `1px solid ${color}08`,
+        }),
         padding: '6px 8px',
         zIndex: isSelected ? 20 : 10,
         boxSizing: 'border-box',
         opacity: isDraggedOrigin ? 0.35 : isGhost ? 0.28 : isDimmed ? 0.68 : 1,
         filter: isDraggedOrigin ? 'saturate(0)' : 'saturate(1)',
-        boxShadow: isDraggedOrigin || isGhost ? 'none' : isSelected
-          ? `0 4px 18px ${color}30, 0 1px 4px ${color}1a`
-          : '0 1px 3px rgba(0,0,0,0.06)',
+        boxShadow: isDraggedOrigin || isGhost ? 'none' : isApple
+          ? '0 1px 4px rgba(162,132,94,0.10), 0 0 0 0.5px rgba(162,132,94,0.06)'
+          : isSelected
+            ? `0 4px 18px ${color}30, 0 1px 4px ${color}1a`
+            : '0 1px 3px rgba(0,0,0,0.06)',
         willChange: isDraggedOrigin ? 'transform' : undefined,
         contain: 'layout style paint',
         transition: isDraggedOrigin ? 'none' : 'opacity 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease, transform 0.12s ease-out',

@@ -71,7 +71,7 @@ function createDemoEvent(): CalendarEvent {
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     location: 'FaceTime',
     category: 'External',
-    color: '#FF3B30', // Apple red
+    color: '#A2845E', // Apple champagne-titanium
     source: 'apple',
     provider: 'apple',
     readOnly: true,
