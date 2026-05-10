@@ -85,7 +85,7 @@ const EventContent = React.memo<{
             provider === 'google'
               ? <GoogleProviderIcon size={isShort ? 10 : 12} className="flex-shrink-0" />
               : provider === 'apple'
-                ? <AppleProviderIcon size={isShort ? 11 : 13} className="flex-shrink-0 opacity-90" />
+                ? <AppleProviderIcon size={isShort ? 14 : 16} className="flex-shrink-0 text-[#1d1d1f] dark:text-[#C0C0C0]" />
                 : <OutlookProviderIcon size={isShort ? 10 : 12} className="flex-shrink-0 opacity-80" />
           )}
           {(forceInitialsMode || useCompactTitle) ? (
@@ -205,7 +205,7 @@ const TimeGridEvent = React.memo<TimeGridEventProps>(({
   const isExternal = provider === 'microsoft' || provider === 'google' || provider === 'apple';
 
   const isApple = provider === 'apple';
-  const APPLE_ACCENT = '#A2845E';
+  const APPLE_ACCENT = '#A8A9B0';
   const color = isApple
     ? APPLE_ACCENT
     : isExternal
@@ -253,10 +253,10 @@ const TimeGridEvent = React.memo<TimeGridEventProps>(({
         left: `calc(${left} + 5px)`,
         width: `calc(${width} - 10px)`,
         ...(isApple ? {
-          /* Apple-flavored card: warm champagne gradient, subtle all-around border */
-          background: 'linear-gradient(135deg, rgba(162,132,94,0.12) 0%, rgba(162,132,94,0.05) 100%)',
-          border: '1px solid rgba(162,132,94,0.18)',
-          borderLeft: '3px solid rgba(162,132,94,0.50)',
+          /* Apple-flavored card: cool silver-titanium gradient, subtle all-around border */
+          background: 'linear-gradient(135deg, rgba(168,169,176,0.16) 0%, rgba(168,169,176,0.06) 100%)',
+          border: '1px solid rgba(168,169,176,0.22)',
+          borderLeft: '3px solid rgba(168,169,176,0.55)',
         } : {
           backgroundColor: isExternal
             ? `${color}14`
@@ -274,7 +274,7 @@ const TimeGridEvent = React.memo<TimeGridEventProps>(({
         opacity: isDraggedOrigin ? 0.35 : isGhost ? 0.28 : isDimmed ? 0.68 : 1,
         filter: isDraggedOrigin ? 'saturate(0)' : 'saturate(1)',
         boxShadow: isDraggedOrigin || isGhost ? 'none' : isApple
-          ? '0 1px 4px rgba(162,132,94,0.10), 0 0 0 0.5px rgba(162,132,94,0.06)'
+          ? '0 1px 4px rgba(120,120,128,0.10), 0 0 0 0.5px rgba(168,169,176,0.08)'
           : isSelected
             ? `0 4px 18px ${color}30, 0 1px 4px ${color}1a`
             : '0 1px 3px rgba(0,0,0,0.06)',

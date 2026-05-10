@@ -6,8 +6,8 @@ import { EVENT_COLORS } from '../constants';
 import { GoogleProviderIcon, OutlookProviderIcon, RepeatIcon } from './icons';
 import { AppleProviderIcon } from './icons/ProviderIcons';
 
-/** Apple's warm champagne-titanium accent. */
-const APPLE_ACCENT = '#A2845E';
+/** Apple's silver-titanium accent — cool neutral metallic. */
+const APPLE_ACCENT = '#A8A9B0';
 
 interface EventItemProps {
   event: CalendarEvent;
@@ -53,11 +53,11 @@ const EventItem = memo<EventItemProps>(({ event, onClick, compact }) => {
         onClick={(e) => { e.stopPropagation(); onClick(event.id); }}
         className="w-full text-left flex items-center gap-1.5 px-2 py-1.5 min-[1400px]:gap-2 min-[1400px]:px-2.5 min-[1400px]:py-2 rounded-lg cursor-default group focus:outline-none"
         style={{
-          background: 'linear-gradient(135deg, rgba(162,132,94,0.10) 0%, rgba(162,132,94,0.04) 100%)',
-          border: '1px solid rgba(162,132,94,0.18)',
+          background: 'linear-gradient(135deg, rgba(168,169,176,0.14) 0%, rgba(168,169,176,0.05) 100%)',
+          border: '1px solid rgba(168,169,176,0.22)',
         }}
       >
-        <AppleProviderIcon size={10} className="flex-shrink-0 opacity-60" />
+        <AppleProviderIcon size={13} className="flex-shrink-0 text-[#1d1d1f] dark:text-[#C0C0C0]" />
         <span
           className="truncate text-[11px] min-[1400px]:text-[12px] font-medium leading-none"
           style={{ color: APPLE_ACCENT }}
@@ -76,16 +76,16 @@ const EventItem = memo<EventItemProps>(({ event, onClick, compact }) => {
         onClick={(e) => { e.stopPropagation(); onClick(event.id); }}
         className="w-full text-left flex flex-col px-2.5 py-2 min-[1400px]:py-2.5 rounded-lg cursor-default group focus:outline-none"
         style={{
-          background: 'linear-gradient(135deg, rgba(162,132,94,0.10) 0%, rgba(162,132,94,0.04) 100%)',
-          border: '1px solid rgba(162,132,94,0.15)',
-          boxShadow: '0 1px 3px rgba(162,132,94,0.06)',
+          background: 'linear-gradient(135deg, rgba(168,169,176,0.14) 0%, rgba(168,169,176,0.05) 100%)',
+          border: '1px solid rgba(168,169,176,0.20)',
+          boxShadow: '0 1px 3px rgba(120,120,128,0.08)',
         }}
       >
         <span
           className="truncate text-[11px] font-semibold leading-tight flex items-center gap-1.5"
           style={{ color: APPLE_ACCENT }}
         >
-          <AppleProviderIcon size={11} className="flex-shrink-0 opacity-70" />
+          <AppleProviderIcon size={14} className="flex-shrink-0 text-[#1d1d1f] dark:text-[#C0C0C0]" />
           {event.title}
         </span>
         {timeLabel && (

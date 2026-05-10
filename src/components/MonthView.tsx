@@ -233,6 +233,15 @@ const MonthView: React.FC<MonthViewProps> = ({ events }) => {
       arr.push(e);
       map.set(key, arr);
     }
+    // Sort each day's events by start time so earlier ones appear first
+    // (and overflow into "+N more" predictably).
+    for (const arr of map.values()) {
+      arr.sort((a, b) => {
+        const aTime = a.startTime || '99:99';
+        const bTime = b.startTime || '99:99';
+        return aTime.localeCompare(bTime);
+      });
+    }
     return map;
   }, [events]);
 

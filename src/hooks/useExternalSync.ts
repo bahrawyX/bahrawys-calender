@@ -56,29 +56,107 @@ function mapToCalendarEvent(e: any): CalendarEvent {
   };
 }
 
-/** Create a static demo Apple Calendar event for today. */
-function createDemoEvent(): CalendarEvent {
-  const today = new Date();
-  const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+/** Format YYYY-MM-DD for a date offset (in days) from today. */
+function offsetDateStr(daysAhead: number): string {
+  const d = new Date();
+  d.setDate(d.getDate() + daysAhead);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
 
-  return {
-    id: 'demo_apple_event_001',
-    title: 'Team Standup',
-    description: 'Daily team sync — imported from Apple Calendar (demo)',
-    date: dateStr,
-    startTime: '14:00',
-    endTime: '14:45',
-    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-    location: 'FaceTime',
-    category: 'External',
-    color: '#A2845E', // Apple champagne-titanium
-    source: 'apple',
-    provider: 'apple',
-    readOnly: true,
-    editable: false,
-    draggable: false,
-    organizer: 'Apple Calendar (Demo)',
-  };
+/** Demo Apple events — one today, plus a second one same day to demo "+N more" overflow. */
+function createAppleDemoEvents(): CalendarEvent[] {
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const today = offsetDateStr(0);
+
+  return [
+    {
+      id: 'demo_apple_event_001',
+      title: 'Dummy (Apple) — Team Standup',
+      description: 'Daily team sync — imported from Apple Calendar (demo)',
+      date: today,
+      startTime: '09:00',
+      endTime: '09:30',
+      timezone: tz,
+      location: 'FaceTime',
+      category: 'External',
+      color: '#A8A9B0',
+      source: 'apple',
+      provider: 'apple',
+      readOnly: true,
+      editable: false,
+      draggable: false,
+      organizer: 'Apple Calendar (Demo)',
+    },
+    // Second event same day → triggers "+1 more" chip on Month view (which caps at 1 per cell).
+    {
+      id: 'demo_apple_event_002',
+      title: 'Dummy Test Event',
+      description: 'Second event on the same day so the +1 more chip appears.',
+      date: today,
+      startTime: '15:00',
+      endTime: '15:45',
+      timezone: tz,
+      location: 'iCloud',
+      category: 'External',
+      color: '#A8A9B0',
+      source: 'apple',
+      provider: 'apple',
+      readOnly: true,
+      editable: false,
+      draggable: false,
+      organizer: 'Apple Calendar (Demo)',
+    },
+  ];
+}
+
+/** Demo Google event — tomorrow. */
+function createGoogleDemoEvents(): CalendarEvent[] {
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  return [
+    {
+      id: 'demo_google_event_001',
+      title: 'Dummy (Google) — Design Review',
+      description: 'Quarterly design review — imported from Google Calendar (demo)',
+      date: offsetDateStr(1),
+      startTime: '11:00',
+      endTime: '12:00',
+      timezone: tz,
+      location: 'Google Meet',
+      category: 'External',
+      color: '#4285F4',
+      source: 'google',
+      provider: 'google',
+      readOnly: true,
+      editable: false,
+      draggable: false,
+      organizer: 'Google Calendar (Demo)',
+    },
+  ];
+}
+
+/** Demo Outlook event — two days from now. */
+function createOutlookDemoEvents(): CalendarEvent[] {
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  return [
+    {
+      id: 'demo_outlook_event_001',
+      title: 'Dummy (Outlook) — Client Sync',
+      description: 'Weekly client sync — imported from Outlook (demo)',
+      date: offsetDateStr(2),
+      startTime: '13:30',
+      endTime: '14:30',
+      timezone: tz,
+      location: 'Microsoft Teams',
+      category: 'External',
+      color: '#0078D4',
+      source: 'outlook',
+      provider: 'microsoft',
+      readOnly: true,
+      editable: false,
+      draggable: false,
+      organizer: 'Outlook (Demo)',
+    },
+  ];
 }
 
 export function useExternalSync() {
@@ -93,14 +171,15 @@ export function useExternalSync() {
   const lastFocusSyncRef = useRef(0);
   const lastRangeRef = useRef('');
 
-  // Inject demo event on mount
+  // Inject one demo event per provider on mount so users can see what external
+  // events look like before connecting (and so the "+N more" overflow chip is
+  // demonstrable in the Month view).
   useEffect(() => {
-    const appleConnected = usePlannerStore.getState().appleConnected;
-    if (!appleConnected) {
-      // Show a demo Apple Calendar event so users can see what external events look like
-      setAppleEvents([createDemoEvent()]);
-    }
-  }, [setAppleEvents]);
+    const state = usePlannerStore.getState();
+    if (!state.appleConnected) setAppleEvents(createAppleDemoEvents());
+    if (!state.googleConnected) setGoogleEvents(createGoogleDemoEvents());
+    if (!state.outlookConnected) setOutlookEvents(createOutlookDemoEvents());
+  }, [setAppleEvents, setGoogleEvents, setOutlookEvents]);
 
   const syncEvents = useCallback(async () => {
     const range = getDateRange(currentDate);
@@ -115,20 +194,30 @@ export function useExternalSync() {
         fetch(`/api/external-events/apple?start=${range.start}&end=${range.end}`),
       ]);
 
+      const state = usePlannerStore.getState();
+
       // Google
       if (googleRes.status === 'fulfilled' && googleRes.value.ok) {
         const data = await googleRes.value.json();
-        if (data.events) {
+        if (data.events && data.events.length > 0) {
           setGoogleEvents(data.events.map(mapToCalendarEvent));
+        } else if (!state.googleConnected) {
+          setGoogleEvents(createGoogleDemoEvents());
         }
+      } else if (!state.googleConnected) {
+        setGoogleEvents(createGoogleDemoEvents());
       }
 
-      // Microsoft
+      // Microsoft / Outlook
       if (msRes.status === 'fulfilled' && msRes.value.ok) {
         const data = await msRes.value.json();
-        if (data.events) {
+        if (data.events && data.events.length > 0) {
           setOutlookEvents(data.events.map(mapToCalendarEvent));
+        } else if (!state.outlookConnected) {
+          setOutlookEvents(createOutlookDemoEvents());
         }
+      } else if (!state.outlookConnected) {
+        setOutlookEvents(createOutlookDemoEvents());
       }
 
       // Apple
@@ -136,12 +225,13 @@ export function useExternalSync() {
         const data = await appleRes.value.json();
         if (data.events && data.events.length > 0) {
           setAppleEvents(data.events.map(mapToCalendarEvent));
+        } else if (!state.appleConnected) {
+          setAppleEvents(createAppleDemoEvents());
         }
       } else {
-        // Keep demo event if Apple not connected
-        const appleConnected = usePlannerStore.getState().appleConnected;
-        if (!appleConnected) {
-          setAppleEvents([createDemoEvent()]);
+        // Keep demo events if Apple not connected
+        if (!state.appleConnected) {
+          setAppleEvents(createAppleDemoEvents());
         }
       }
 

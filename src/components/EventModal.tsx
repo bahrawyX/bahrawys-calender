@@ -75,7 +75,7 @@ const EventModal: React.FC = () => {
   const isExternalEvent = provider === 'google' || provider === 'microsoft' || provider === 'apple';
   const isGoogleEvent = provider === 'google';
   const isAppleEvent = provider === 'apple';
-  const APPLE_BRAND_COLOR = '#A2845E';
+  const APPLE_BRAND_COLOR = '#A8A9B0';
   const externalColor = activeEvent?.color || (isAppleEvent ? APPLE_BRAND_COLOR : isGoogleEvent ? GOOGLE_BRAND_COLOR : OUTLOOK_BRAND_COLOR);
 
   const [formData, setFormData] = useState<Partial<CalendarEvent>>({
@@ -169,7 +169,7 @@ const EventModal: React.FC = () => {
                 isGoogleEvent
                   ? <GoogleProviderIcon size={16} className="flex-shrink-0" />
                   : isAppleEvent
-                    ? <AppleProviderIcon size={17} className="flex-shrink-0" />
+                    ? <AppleProviderIcon size={18} className="flex-shrink-0 text-[#1d1d1f] dark:text-[#C0C0C0]" />
                     : <OutlookProviderIcon size={16} className="flex-shrink-0" />
               )}
               {isGoogleEvent

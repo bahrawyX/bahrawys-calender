@@ -3,6 +3,7 @@ import React from 'react';
 interface ProviderIconProps {
   size?: number;
   className?: string;
+  style?: React.CSSProperties;
 }
 
 // Use plain <img> instead of next/image — SVG files don't go through the
@@ -30,13 +31,14 @@ export const GoogleProviderIcon: React.FC<ProviderIconProps> = ({ size = 16, cla
   />
 );
 
-export const AppleProviderIcon: React.FC<ProviderIconProps> = ({ size = 16, className }) => (
+export const AppleProviderIcon: React.FC<ProviderIconProps> = ({ size = 16, className, style }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 24 24"
     width={size}
     height={size}
     className={className}
+    style={style}
     aria-label="Apple"
   >
     <path

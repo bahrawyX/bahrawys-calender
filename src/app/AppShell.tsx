@@ -25,10 +25,20 @@ import {
   SidebarMenuButton,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
-import { ChevronLeftIcon, ChevronRightIcon } from "@/components/icons";
+import { ChevronLeftIcon, ChevronRightIcon, TrashIcon } from "@/components/icons";
 import { GoogleProviderIcon, OutlookProviderIcon, AppleProviderIcon } from "@/components/icons";
 import { useExternalSync } from "@/hooks/useExternalSync";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import CustomContextDialog from "@/components/CustomContextDialog";
+import { CATEGORIES } from "@/constants";
+import type { EventCategory } from "@/types";
 
 /* ─── Inline icons ─────────────────────────────────────────────────── */
 const PlusIcon = ({ size = 16, className = "" }: { size?: number; className?: string }) => (
@@ -59,6 +69,19 @@ const FilterIcon = ({ size = 16, className = "" }: { size?: number; className?: 
 const RefreshIcon = ({ size = 16, className = "" }: { size?: number; className?: string }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className={className}>
     <polyline points="23 4 23 10 17 10" /><polyline points="1 20 1 14 7 14" /><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+  </svg>
+);
+
+const MoreIcon = ({ size = 14, className = "" }: { size?: number; className?: string }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <circle cx="12" cy="5" r="1" /><circle cx="12" cy="12" r="1" /><circle cx="12" cy="19" r="1" />
+  </svg>
+);
+
+const PencilIcon = ({ size = 13, className = "" }: { size?: number; className?: string }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4Z" />
   </svg>
 );
 
@@ -276,7 +299,7 @@ const CalendarFiltersDialog: React.FC<{
                 {appleCals.length > 0 && (
                   <div>
                     <div className="flex items-center gap-2 mb-2.5">
-                      <AppleProviderIcon size={15} />
+                      <AppleProviderIcon size={15} className="text-[#1d1d1f] dark:text-[#C0C0C0]" />
                       <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
                         Apple Calendar
                       </span>
@@ -403,7 +426,7 @@ const AppleConnectModal: React.FC<{
         {/* Header */}
         <div className="px-5 pt-5 pb-3 flex items-center justify-between border-b border-border/40">
           <div className="flex items-center gap-2.5">
-            <AppleProviderIcon size={18} />
+            <AppleProviderIcon size={18} className="text-[#1d1d1f] dark:text-[#C0C0C0]" />
             <h3 className="text-sm font-semibold text-foreground">Connect Apple Calendar</h3>
           </div>
           <button
@@ -505,6 +528,27 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const isFocusMode = useCalendarStore((s) => s.isFocusMode);
   const undo = useCalendarEventsStore((s) => s.undo);
   const redo = useCalendarEventsStore((s) => s.redo);
+
+  // Contexts (categories) — built-in + user-defined, with toggle filtering.
+  const activeFilters = useCalendarStore((s) => s.activeFilters);
+  const toggleFilter = useCalendarStore((s) => s.toggleFilter);
+  const customCategories = useCalendarStore((s) => s.customCategories);
+  const addCustomCategory = useCalendarStore((s) => s.addCustomCategory);
+  const updateContext = useCalendarStore((s) => s.updateContext);
+  const deleteContext = useCalendarStore((s) => s.deleteContext);
+
+  const allCategories = React.useMemo(
+    () => [...CATEGORIES, ...customCategories.map((c) => ({ name: c.name as EventCategory, color: c.color }))],
+    [customCategories]
+  );
+
+  // Context dialog state
+  const [customContextDialogOpen, setCustomContextDialogOpen] = useState(false);
+  const [editingContextName, setEditingContextName] = useState<string | null>(null);
+  const [openContextMenu, setOpenContextMenu] = useState<string | null>(null);
+  const editingContext = editingContextName
+    ? customCategories.find((c) => c.name === editingContextName) ?? null
+    : null;
 
   // Planner store — integration state
   const outlookConnected = usePlannerStore((s) => s.outlookConnected);
@@ -913,7 +957,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     >
                       <AppleProviderIcon
                         size={17}
-                        className="relative z-10 flex-shrink-0"
+                        className="relative z-10 flex-shrink-0 text-[#1d1d1f] dark:text-[#C0C0C0]"
                       />
                       {!isSidebarCollapsed && (
                         <div className="relative z-10 flex-1 flex items-center justify-between min-w-0">
@@ -961,6 +1005,107 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   </Tooltip>
                 </SidebarMenuItem>
               )}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* ── Contexts (categories) ──────────────────────────────────── */}
+        <SidebarSeparator className="my-2" />
+        <SidebarGroup className="px-2">
+          {!isSidebarCollapsed && (
+            <div className="flex items-center justify-between px-3 mb-1">
+              <SidebarGroupLabel className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground/50 p-0">
+                Contexts
+              </SidebarGroupLabel>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    onClick={() => setCustomContextDialogOpen(true)}
+                    aria-label="Add custom context"
+                    className="p-1 rounded-md hover:bg-accent/50 transition-colors"
+                  >
+                    <PlusIcon size={12} className="text-muted-foreground" />
+                  </button>
+                </TooltipTrigger>
+                {tooltipsReady && <TooltipContent side="right">Add Custom Context</TooltipContent>}
+              </Tooltip>
+            </div>
+          )}
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {allCategories.map((cat) => {
+                const active = activeFilters.includes(cat.name);
+                const isCustom = customCategories.some((c) => c.name === cat.name);
+                return (
+                  <SidebarMenuItem key={cat.name}>
+                    <div className="group relative flex items-center">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <SidebarMenuButton
+                            onClick={() => toggleFilter(cat.name)}
+                            isActive={active}
+                            className={`h-7 ${isSidebarCollapsed ? 'justify-center' : 'pr-9'}`}
+                          >
+                            <div
+                              className={`flex-shrink-0 w-1.5 h-1.5 rounded-full transition-transform ${active ? 'scale-150 ring-2 ring-current/10' : ''}`}
+                              style={{ backgroundColor: cat.color, opacity: active ? 1 : 0.7 }}
+                            />
+                            {!isSidebarCollapsed && (
+                              <span className={`font-sans text-[13px] truncate ${active ? 'text-foreground' : 'text-muted-foreground/80'}`}>
+                                {cat.name}
+                              </span>
+                            )}
+                          </SidebarMenuButton>
+                        </TooltipTrigger>
+                        {tooltipsReady && <TooltipContent side="right">{cat.name}</TooltipContent>}
+                      </Tooltip>
+
+                      {!isSidebarCollapsed && isCustom && (
+                        <div className={`absolute right-1 top-1/2 -translate-y-1/2 transition-opacity ${openContextMenu === cat.name ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+                          <DropdownMenu
+                            open={openContextMenu === cat.name}
+                            onOpenChange={(open) => setOpenContextMenu(open ? cat.name : null)}
+                          >
+                            <DropdownMenuTrigger asChild>
+                              <button
+                                type="button"
+                                className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
+                                onClick={(e) => e.stopPropagation()}
+                                aria-label={`Manage ${cat.name} context`}
+                              >
+                                <MoreIcon size={13} />
+                              </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-44" sideOffset={6}>
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  setOpenContextMenu(null);
+                                  setEditingContextName(cat.name);
+                                }}
+                              >
+                                <PencilIcon size={13} />
+                                Edit Context
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  setOpenContextMenu(null);
+                                  deleteContext(cat.name);
+                                }}
+                                className="text-destructive focus:text-destructive focus:bg-destructive/10"
+                              >
+                                <TrashIcon size={13} />
+                                Delete Context
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      )}
+                    </div>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -1049,7 +1194,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
 
           {/* Content area */}
-          <div className="w-full max-w-[1024px] min-[1800px]:max-w-[1280px] min-[1800px]:mx-auto flex-1 flex flex-col min-h-0 p-3 md:p-4 lg:px-8 lg:py-1.5 pt-2 pb-[calc(env(safe-area-inset-bottom)+72px)] md:pb-4 lg:pb-1.5 relative">
+          <div className="w-full max-w-[1024px] min-[1800px]:max-w-[1280px] mx-auto flex-1 flex flex-col min-h-0 p-3 md:p-4 lg:px-8 lg:py-1.5 pt-2 pb-[calc(env(safe-area-inset-bottom)+72px)] md:pb-4 lg:pb-1.5 relative">
             {children}
           </div>
         </main>
@@ -1099,6 +1244,27 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         open={appleConnectOpen}
         onClose={() => setAppleConnectOpen(false)}
         onSuccess={handleAppleConnectSuccess}
+      />
+
+      {/* Create new custom context */}
+      <CustomContextDialog
+        open={customContextDialogOpen}
+        onOpenChange={setCustomContextDialogOpen}
+        onSave={(name, color) => addCustomCategory(name, color)}
+      />
+
+      {/* Edit existing custom context */}
+      <CustomContextDialog
+        open={Boolean(editingContext)}
+        onOpenChange={(open) => { if (!open) setEditingContextName(null); }}
+        onSave={(name, color) => {
+          if (!editingContextName) return;
+          const saved = updateContext(editingContextName, { name, color });
+          if (saved) setEditingContextName(null);
+        }}
+        initialName={editingContext?.name ?? ''}
+        initialColor={editingContext?.color ?? '#EF4444'}
+        mode="edit"
       />
     </>
   );
