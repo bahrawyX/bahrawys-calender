@@ -303,7 +303,7 @@ const MonthView: React.FC<MonthViewProps> = ({ events }) => {
             ))}
           </div>
 
-      <div className="flex-1 min-h-0 overflow-hidden">
+      <div className="flex-1 min-h-0 overflow-hidden rounded-t-xl">
         <div
           className={`h-full w-full grid grid-cols-7 p-1 gap-0.5 ${GRID_CANVAS_CLS}`}
           // 6 equal-height rows that share the available vertical space.
