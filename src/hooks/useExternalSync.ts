@@ -13,10 +13,12 @@
  * - Listens for `lumina:external-sync-now` custom events for forced sync
  * - Re-fetches on tab focus (debounced to 30s)
  * - Injects a static demo event so users can see external events before connecting
+ * - Injects one demo event per built-in context after DB hydration
  */
 import { useEffect, useRef, useCallback } from 'react';
 import { useCalendarStore } from '@/store/useCalendarStore';
 import { usePlannerStore } from '@/store/usePlannerStore';
+import { useCalendarEventsStore } from '@/store/useCalendarEventsStore';
 import { CalendarEvent } from '@/types';
 
 const POLL_INTERVAL = 10 * 60 * 1000; // 10 minutes
@@ -134,6 +136,35 @@ function createGoogleDemoEvents(): CalendarEvent[] {
   ];
 }
 
+/** Demo local events — one per built-in context, spread over nearby days. */
+function createContextDemoEvents(): CalendarEvent[] {
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  // Offset from today: Critical=-1, Focus=0, Work=1, Social=2, Personal=3, Health=4
+  const contexts: Array<{ name: string; color: string; days: number; start: string; end: string }> = [
+    { name: 'Critical', color: '#EF4444', days: -1, start: '08:00', end: '09:00' },
+    { name: 'Focus',    color: '#6D59E0', days:  0, start: '10:00', end: '11:30' },
+    { name: 'Work',     color: '#475569', days:  1, start: '14:00', end: '15:00' },
+    { name: 'Social',   color: '#F59E0B', days:  2, start: '18:00', end: '19:30' },
+    { name: 'Personal', color: '#10B981', days:  3, start: '07:30', end: '08:15' },
+    { name: 'Health',   color: '#EC4899', days:  4, start: '06:30', end: '07:30' },
+  ];
+
+  return contexts.map(({ name, color, days, start, end }) => ({
+    id: `demo_ctx_${name.toLowerCase()}_001`,
+    title: `Dummy (${name})`,
+    description: `Demo event for the ${name} context — shows the ${name.toLowerCase()}-tinted gradient card.`,
+    date: offsetDateStr(days),
+    startTime: start,
+    endTime: end,
+    timezone: tz,
+    category: name,
+    color,
+    readOnly: false,
+    editable: true,
+    draggable: true,
+  }));
+}
+
 /** Demo Outlook event — two days from now. */
 function createOutlookDemoEvents(): CalendarEvent[] {
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -168,6 +199,9 @@ export function useExternalSync() {
   const setSyncError = usePlannerStore((s) => s.setSyncError);
   const setLastSyncedAt = usePlannerStore((s) => s.setLastSyncedAt);
 
+  // Context demo events — injected into the local events store after hydration
+  const dbHydrated = useCalendarEventsStore((s) => s.dbHydrated);
+
   const lastFocusSyncRef = useRef(0);
   const lastRangeRef = useRef('');
 
@@ -180,6 +214,22 @@ export function useExternalSync() {
     if (!state.googleConnected) setGoogleEvents(createGoogleDemoEvents());
     if (!state.outlookConnected) setOutlookEvents(createOutlookDemoEvents());
   }, [setAppleEvents, setGoogleEvents, setOutlookEvents]);
+
+  // Inject one demo local event per built-in context after DB hydration so
+  // users can verify the gradient card treatment for each category color.
+  // Uses addEventOptimistic (no DB write) so the demos are session-only and
+  // won't pollute the user's real event list.
+  useEffect(() => {
+    if (!dbHydrated) return;
+    const eventsStore = useCalendarEventsStore.getState();
+    const existingIds = new Set(eventsStore.events.map((e) => e.id));
+    createContextDemoEvents().forEach((demo) => {
+      if (!existingIds.has(demo.id)) {
+        eventsStore.addEventOptimistic(demo);
+      }
+    });
+  // Re-run only when hydration completes (runs once after first true)
+  }, [dbHydrated]);
 
   const syncEvents = useCallback(async () => {
     const range = getDateRange(currentDate);

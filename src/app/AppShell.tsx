@@ -1119,7 +1119,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <>
       <div className="flex h-screen w-full bg-background overflow-hidden text-foreground antialiased" style={{ animation: 'appShellFadeIn 0.4s cubic-bezier(0.4,0,0.2,1) both' }}>
         {/* Desktop sidebar */}
-        <div className="hidden lg:flex lg:h-full">
+        <div className="hidden lg:flex lg:h-full relative">
           <motion.aside
             initial={false}
             animate={isSidebarCollapsed ? 'collapsed' : 'expanded'}
@@ -1130,22 +1130,22 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             transition={{ type: 'spring', damping: 28, stiffness: 220 }}
             className="relative flex flex-col h-full bg-background border-r border-border/60 z-40 overflow-hidden"
           >
-            {/* Collapse toggle */}
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => setSidebarCollapsed(!isSidebarCollapsed)}
-              className="absolute -right-3 top-12 h-6 w-6 min-h-6 min-w-6 p-0 rounded-full border border-border/80 bg-background shadow-sm z-50 hover:bg-accent/50 transition-colors flex items-center justify-center"
-            >
-              {isSidebarCollapsed ? (
-                <ChevronRightIcon size={12} className="flex-shrink-0" />
-              ) : (
-                <ChevronLeftIcon size={12} className="flex-shrink-0" />
-              )}
-            </Button>
-
             {sidebarInner}
           </motion.aside>
+
+          {/* Collapse toggle — lives OUTSIDE the overflow-hidden aside so it isn't clipped */}
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setSidebarCollapsed(!isSidebarCollapsed)}
+            className="absolute -right-3 top-12 h-6 w-6 min-h-6 min-w-6 p-0 rounded-full border border-border/80 bg-background shadow-sm z-50 hover:bg-accent/50 transition-colors flex items-center justify-center"
+          >
+            {isSidebarCollapsed ? (
+              <ChevronRightIcon size={12} className="flex-shrink-0" />
+            ) : (
+              <ChevronLeftIcon size={12} className="flex-shrink-0" />
+            )}
+          </Button>
         </div>
 
         {/* Mobile sidebar overlay */}

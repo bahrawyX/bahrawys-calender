@@ -183,12 +183,11 @@ const EventItem = memo<EventItemProps>(({ event, onClick, compact }) => {
     ? {
         background: `linear-gradient(135deg, rgba(${rgb},0.14) 0%, rgba(${rgb},0.05) 100%)`,
         border: `1px solid rgba(${rgb},0.22)`,
-        borderLeft: `3px solid rgba(${rgb},0.55)`,
         boxShadow: `0 1px 3px rgba(${rgb},0.08)`,
       }
     : {
         backgroundColor: `${color}12`,
-        borderLeft: `2px solid ${color}`,
+        border: `1px solid ${color}20`,
       };
 
   if (compact) {

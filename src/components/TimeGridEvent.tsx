@@ -286,22 +286,17 @@ const TimeGridEvent = React.memo<TimeGridEventProps>(({
           /* External-provider card: brand-tinted gradient + subtle all-around border. */
           background: `linear-gradient(135deg, rgba(${externalRgb},0.16) 0%, rgba(${externalRgb},0.06) 100%)`,
           border: `1px solid rgba(${externalRgb},0.22)`,
-          borderLeft: `3px solid rgba(${externalRgb},0.55)`,
         } : localRgb ? {
           /* Local event w/ hex color: same gradient language, tinted with
              the category color so user-defined contexts (e.g. Critical=red)
-             read as that color throughout the card, not just on the rail. */
+             read as that color throughout the card. */
           background: `linear-gradient(135deg, rgba(${localRgb},0.16) 0%, rgba(${localRgb},0.06) 100%)`,
           border: `1px solid rgba(${localRgb},0.22)`,
-          borderLeft: `3px solid rgba(${localRgb},${isSelected ? 0.85 : 0.6})`,
         } : {
           /* Legacy fallback for events whose stored color isn't hex
              (e.g. old hsl() values). Keeps the original flat tint. */
           backgroundColor: `${color}${isSelected ? '1c' : '10'}`,
-          borderLeft: `3px solid ${color}${isSelected ? 'cc' : '70'}`,
-          borderTop: `1px solid ${color}12`,
-          borderRight: `1px solid ${color}08`,
-          borderBottom: `1px solid ${color}08`,
+          border: `1px solid ${color}18`,
         }),
         padding: '6px 8px',
         zIndex: isSelected ? 20 : 10,
