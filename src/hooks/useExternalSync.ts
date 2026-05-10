@@ -18,7 +18,6 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useCalendarStore } from '@/store/useCalendarStore';
 import { usePlannerStore } from '@/store/usePlannerStore';
-import { useCalendarEventsStore } from '@/store/useCalendarEventsStore';
 import { CalendarEvent } from '@/types';
 
 const POLL_INTERVAL = 10 * 60 * 1000; // 10 minutes
@@ -195,12 +194,10 @@ export function useExternalSync() {
   const setGoogleEvents = usePlannerStore((s) => s.setGoogleEvents);
   const setOutlookEvents = usePlannerStore((s) => s.setOutlookEvents);
   const setAppleEvents = usePlannerStore((s) => s.setAppleEvents);
+  const setDemoLocalEvents = usePlannerStore((s) => s.setDemoLocalEvents);
   const setIsSyncing = usePlannerStore((s) => s.setIsSyncing);
   const setSyncError = usePlannerStore((s) => s.setSyncError);
   const setLastSyncedAt = usePlannerStore((s) => s.setLastSyncedAt);
-
-  // Context demo events — injected into the local events store after hydration
-  const dbHydrated = useCalendarEventsStore((s) => s.dbHydrated);
 
   const lastFocusSyncRef = useRef(0);
   const lastRangeRef = useRef('');
@@ -215,21 +212,13 @@ export function useExternalSync() {
     if (!state.outlookConnected) setOutlookEvents(createOutlookDemoEvents());
   }, [setAppleEvents, setGoogleEvents, setOutlookEvents]);
 
-  // Inject one demo local event per built-in context after DB hydration so
-  // users can verify the gradient card treatment for each category color.
-  // Uses addEventOptimistic (no DB write) so the demos are session-only and
-  // won't pollute the user's real event list.
+  // Inject one demo local event per built-in context so users can verify
+  // the gradient card treatment for each category color. Stored in the planner
+  // store (same as external demos) so they're always visible without any
+  // DB-hydration timing dependency.
   useEffect(() => {
-    if (!dbHydrated) return;
-    const eventsStore = useCalendarEventsStore.getState();
-    const existingIds = new Set(eventsStore.events.map((e) => e.id));
-    createContextDemoEvents().forEach((demo) => {
-      if (!existingIds.has(demo.id)) {
-        eventsStore.addEventOptimistic(demo);
-      }
-    });
-  // Re-run only when hydration completes (runs once after first true)
-  }, [dbHydrated]);
+    setDemoLocalEvents(createContextDemoEvents());
+  }, [setDemoLocalEvents]);
 
   const syncEvents = useCallback(async () => {
     const range = getDateRange(currentDate);

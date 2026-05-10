@@ -9,6 +9,8 @@ interface PlannerState {
   googleEvents: CalendarEvent[];
   /** Apple Calendar events — fetched via CalDAV, browser-cached only. NOT in DB. */
   appleEvents: CalendarEvent[];
+  /** Session-only demo events for built-in contexts (Critical/Focus/Work/Social/Personal/Health). */
+  demoLocalEvents: CalendarEvent[];
   outlookConnected: boolean;
   googleConnected: boolean;
   appleConnected: boolean;
@@ -20,6 +22,7 @@ interface PlannerState {
   setOutlookEvents: (events: CalendarEvent[]) => void;
   setGoogleEvents:  (events: CalendarEvent[]) => void;
   setAppleEvents:   (events: CalendarEvent[]) => void;
+  setDemoLocalEvents: (events: CalendarEvent[]) => void;
   setOutlookConnected: (connected: boolean) => void;
   setGoogleConnected:  (connected: boolean) => void;
   setAppleConnected:   (connected: boolean) => void;
@@ -37,6 +40,7 @@ export const usePlannerStore = create<PlannerState>()(
       outlookEvents: [],
       googleEvents:  [],
       appleEvents:   [],
+      demoLocalEvents: [],
       outlookConnected: false,
       googleConnected:  false,
       appleConnected:   false,
@@ -48,6 +52,7 @@ export const usePlannerStore = create<PlannerState>()(
       setOutlookEvents:    (outlookEvents)    => set({ outlookEvents }),
       setGoogleEvents:     (googleEvents)     => set({ googleEvents }),
       setAppleEvents:      (appleEvents)      => set({ appleEvents }),
+      setDemoLocalEvents:  (demoLocalEvents)  => set({ demoLocalEvents }),
       setOutlookConnected: (outlookConnected) => set({ outlookConnected }),
       setGoogleConnected:  (googleConnected)  => set({ googleConnected }),
       setAppleConnected:   (appleConnected)   => set({ appleConnected }),
