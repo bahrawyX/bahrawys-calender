@@ -7,8 +7,11 @@ interface PlannerState {
   outlookEvents: CalendarEvent[];
   /** Google Calendar events — fetched from provider API, browser-cached only. NOT in DB. */
   googleEvents: CalendarEvent[];
+  /** Apple Calendar events — fetched via CalDAV, browser-cached only. NOT in DB. */
+  appleEvents: CalendarEvent[];
   outlookConnected: boolean;
   googleConnected: boolean;
+  appleConnected: boolean;
   outlookSyncing: boolean;
   isSyncing: boolean;
   lastSyncedAt: string | null;
@@ -16,8 +19,10 @@ interface PlannerState {
 
   setOutlookEvents: (events: CalendarEvent[]) => void;
   setGoogleEvents:  (events: CalendarEvent[]) => void;
+  setAppleEvents:   (events: CalendarEvent[]) => void;
   setOutlookConnected: (connected: boolean) => void;
   setGoogleConnected:  (connected: boolean) => void;
+  setAppleConnected:   (connected: boolean) => void;
   setOutlookSyncing:   (syncing: boolean) => void;
   setIsSyncing: (syncing: boolean) => void;
   setLastSyncedAt: (iso: string | null) => void;
@@ -31,8 +36,10 @@ export const usePlannerStore = create<PlannerState>()(
     (set) => ({
       outlookEvents: [],
       googleEvents:  [],
+      appleEvents:   [],
       outlookConnected: false,
       googleConnected:  false,
+      appleConnected:   false,
       outlookSyncing:   false,
       isSyncing: false,
       lastSyncedAt: null,
@@ -40,21 +47,24 @@ export const usePlannerStore = create<PlannerState>()(
 
       setOutlookEvents:    (outlookEvents)    => set({ outlookEvents }),
       setGoogleEvents:     (googleEvents)     => set({ googleEvents }),
+      setAppleEvents:      (appleEvents)      => set({ appleEvents }),
       setOutlookConnected: (outlookConnected) => set({ outlookConnected }),
       setGoogleConnected:  (googleConnected)  => set({ googleConnected }),
+      setAppleConnected:   (appleConnected)   => set({ appleConnected }),
       setOutlookSyncing:   (outlookSyncing)   => set({ outlookSyncing }),
       setIsSyncing:        (isSyncing)        => set({ isSyncing }),
       setLastSyncedAt:     (lastSyncedAt)     => set({ lastSyncedAt }),
       setSyncError:        (syncError)        => set({ syncError }),
-      clearExternalEvents: () => set({ outlookEvents: [], googleEvents: [] }),
+      clearExternalEvents: () => set({ outlookEvents: [], googleEvents: [], appleEvents: [] }),
     }),
     {
       name: 'lumina-planner',
       // Explicit return type guarantees event arrays can NEVER accidentally
       // be added to localStorage persistence in a future edit.
-      partialize: (state): { outlookConnected: boolean; googleConnected: boolean } => ({
+      partialize: (state): { outlookConnected: boolean; googleConnected: boolean; appleConnected: boolean } => ({
         outlookConnected: state.outlookConnected,
         googleConnected: state.googleConnected,
+        appleConnected: state.appleConnected,
       }),
     }
   )

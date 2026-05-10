@@ -26,7 +26,7 @@ import {
   SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { ChevronLeftIcon, ChevronRightIcon } from "@/components/icons";
-import { GoogleProviderIcon, OutlookProviderIcon } from "@/components/icons";
+import { GoogleProviderIcon, OutlookProviderIcon, AppleProviderIcon } from "@/components/icons";
 import { useExternalSync } from "@/hooks/useExternalSync";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -79,7 +79,7 @@ type IntegrationProvider = 'google' | 'microsoft';
 
 interface ExternalCalendarFilter {
   id: string;
-  provider: 'google' | 'microsoft';
+  provider: 'google' | 'microsoft' | 'apple';
   name: string;
   color: string;
   enabled: boolean;
@@ -193,6 +193,7 @@ const CalendarFiltersDialog: React.FC<{
 
   const googleCals = filters.filter((f) => f.provider === 'google');
   const msCals = filters.filter((f) => f.provider === 'microsoft');
+  const appleCals = filters.filter((f) => f.provider === 'apple');
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center">
@@ -271,6 +272,27 @@ const CalendarFiltersDialog: React.FC<{
                     </div>
                   </div>
                 )}
+
+                {appleCals.length > 0 && (
+                  <div>
+                    <div className="flex items-center gap-2 mb-2.5">
+                      <AppleProviderIcon size={14} />
+                      <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                        Apple Calendar
+                      </span>
+                    </div>
+                    <div className="space-y-1">
+                      {appleCals.map((cal) => (
+                        <CalendarFilterRow
+                          key={cal.id}
+                          cal={cal}
+                          saving={savingId === cal.id}
+                          onToggle={() => toggleFilter(cal)}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
               </>
             )}
           </div>
@@ -328,6 +350,146 @@ const CalendarFilterRow: React.FC<{
   </button>
 );
 
+/* ─── Apple Calendar Connect Modal ─────────────────────────────────── */
+const AppleConnectModal: React.FC<{
+  open: boolean;
+  onClose: () => void;
+  onSuccess: () => void;
+}> = ({ open, onClose, onSuccess }) => {
+  const [email, setEmail] = useState('');
+  const [appPassword, setAppPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !appPassword) {
+      setError('Both fields are required');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await fetch('/api/integrations/apple/connect', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, appPassword }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Connection failed');
+      }
+
+      onSuccess();
+      onClose();
+      setEmail('');
+      setAppPassword('');
+    } catch (err: any) {
+      setError(err.message || 'Failed to connect');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/60" onClick={onClose} />
+      <div className="relative bg-background rounded-2xl border border-border/60 shadow-2xl w-[400px] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        {/* Header */}
+        <div className="px-5 pt-5 pb-3 flex items-center justify-between border-b border-border/40">
+          <div className="flex items-center gap-2.5">
+            <AppleProviderIcon size={18} />
+            <h3 className="text-sm font-semibold text-foreground">Connect Apple Calendar</h3>
+          </div>
+          <button
+            onClick={onClose}
+            className="h-6 w-6 flex items-center justify-center rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="px-5 py-4 space-y-4">
+          <div className="text-xs text-muted-foreground leading-relaxed">
+            Apple Calendar uses an{' '}
+            <span className="font-medium text-foreground">app-specific password</span>
+            {' '}instead of OAuth. Generate one at{' '}
+            <a
+              href="https://appleid.apple.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline"
+            >
+              appleid.apple.com
+            </a>
+            {' '}→ Sign-In and Security → App-Specific Passwords.
+          </div>
+
+          <div className="space-y-3">
+            <div>
+              <label className="block text-xs font-medium text-foreground mb-1.5">Apple ID Email</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="name@icloud.com"
+                disabled={loading}
+                className="w-full h-9 px-3 rounded-lg bg-muted/50 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-colors disabled:opacity-50"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-foreground mb-1.5">App-Specific Password</label>
+              <input
+                type="password"
+                value={appPassword}
+                onChange={(e) => setAppPassword(e.target.value)}
+                placeholder="xxxx-xxxx-xxxx-xxxx"
+                disabled={loading}
+                className="w-full h-9 px-3 rounded-lg bg-muted/50 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-colors disabled:opacity-50"
+              />
+            </div>
+          </div>
+
+          {error && (
+            <div className="text-xs text-red-500 bg-red-500/10 rounded-lg px-3 py-2">
+              {error}
+            </div>
+          )}
+
+          <div className="flex items-center justify-end gap-2 pt-1">
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={loading}
+              className="h-8 px-3 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={loading || !email || !appPassword}
+              className="h-8 px-4 rounded-lg text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50 flex items-center gap-2"
+            >
+              {loading && (
+                <span className="w-3 h-3 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+              )}
+              Connect
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
 /* ─── AppShell ─────────────────────────────────────────────────────── */
 export function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -347,8 +509,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   // Planner store — integration state
   const outlookConnected = usePlannerStore((s) => s.outlookConnected);
   const googleConnected = usePlannerStore((s) => s.googleConnected);
+  const appleConnected = usePlannerStore((s) => s.appleConnected);
   const setOutlookConnected = usePlannerStore((s) => s.setOutlookConnected);
   const setGoogleConnected = usePlannerStore((s) => s.setGoogleConnected);
+  const setAppleConnected = usePlannerStore((s) => s.setAppleConnected);
   const clearExternalEvents = usePlannerStore((s) => s.clearExternalEvents);
   const isSyncing = usePlannerStore((s) => s.isSyncing);
 
@@ -358,7 +522,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   // Integration UI state
   const [googleLoading, setGoogleLoading] = useState(false);
   const [outlookLoading, setOutlookLoading] = useState(false);
+  const [appleLoading, setAppleLoading] = useState(false);
   const [calendarFiltersOpen, setCalendarFiltersOpen] = useState(false);
+  const [appleConnectOpen, setAppleConnectOpen] = useState(false);
 
   // Mobile sidebar state
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
@@ -397,12 +563,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         const data = await res.json();
         setGoogleConnected(data.google?.connected ?? false);
         setOutlookConnected(data.microsoft?.connected ?? false);
+        setAppleConnected(data.apple?.connected ?? false);
       } catch {
         // Silently fail — status will show as disconnected
       }
     };
     refreshStatus();
-  }, [setGoogleConnected, setOutlookConnected]);
+  }, [setGoogleConnected, setOutlookConnected, setAppleConnected]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -461,10 +628,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       const data = await res.json();
       setGoogleConnected(data.google?.connected ?? false);
       setOutlookConnected(data.microsoft?.connected ?? false);
+      setAppleConnected(data.apple?.connected ?? false);
     } catch {
       // silently fail
     }
-  }, [setGoogleConnected, setOutlookConnected]);
+  }, [setGoogleConnected, setOutlookConnected, setAppleConnected]);
 
   const handleGoogleConnect = useCallback(async () => {
     if (googleConnected) {
@@ -527,6 +695,31 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       },
     );
   }, [outlookConnected, setOutlookConnected, clearExternalEvents, refreshStatus]);
+
+  const handleAppleConnect = useCallback(async () => {
+    if (appleConnected) {
+      // Disconnect
+      setAppleLoading(true);
+      try {
+        await fetch('/api/integrations/apple/disconnect', { method: 'POST' });
+        setAppleConnected(false);
+        clearExternalEvents();
+      } catch (err) {
+        console.error('Apple disconnect failed:', err);
+      } finally {
+        setAppleLoading(false);
+      }
+      return;
+    }
+
+    // Open the Apple connect modal (CalDAV uses credentials, not OAuth popup)
+    setAppleConnectOpen(true);
+  }, [appleConnected, setAppleConnected, clearExternalEvents]);
+
+  const handleAppleConnectSuccess = useCallback(async () => {
+    await refreshStatus();
+    window.dispatchEvent(new CustomEvent('lumina:external-sync-now'));
+  }, [refreshStatus]);
 
   const isCalendarPage = pathname === '/calendar';
 
@@ -710,8 +903,42 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 </Tooltip>
               </SidebarMenuItem>
 
+              {/* Apple Calendar */}
+              <SidebarMenuItem>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <SidebarMenuButton
+                      onClick={handleAppleConnect}
+                      className={`h-8 ${isSidebarCollapsed ? 'justify-center' : ''}`}
+                    >
+                      <AppleProviderIcon
+                        size={15}
+                        className="relative z-10 flex-shrink-0"
+                      />
+                      {!isSidebarCollapsed && (
+                        <div className="relative z-10 flex-1 flex items-center justify-between min-w-0">
+                          <span className="font-sans text-[13px] truncate text-muted-foreground/90">
+                            Apple Calendar
+                          </span>
+                          <IntegrationBadge
+                            connected={appleConnected}
+                            loading={appleLoading}
+                            syncing={isSyncing && appleConnected}
+                          />
+                        </div>
+                      )}
+                    </SidebarMenuButton>
+                  </TooltipTrigger>
+                  {tooltipsReady && (
+                    <TooltipContent side="right">
+                      {appleConnected ? 'Disconnect Apple Calendar' : 'Connect Apple Calendar'}
+                    </TooltipContent>
+                  )}
+                </Tooltip>
+              </SidebarMenuItem>
+
               {/* Calendar Filters */}
-              {(googleConnected || outlookConnected) && (
+              {(googleConnected || outlookConnected || appleConnected) && (
                 <SidebarMenuItem>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -865,6 +1092,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <CalendarFiltersDialog
         open={calendarFiltersOpen}
         onClose={() => setCalendarFiltersOpen(false)}
+      />
+
+      {/* Apple Calendar Connect Modal */}
+      <AppleConnectModal
+        open={appleConnectOpen}
+        onClose={() => setAppleConnectOpen(false)}
+        onSuccess={handleAppleConnectSuccess}
       />
     </>
   );

@@ -44,6 +44,7 @@ export const useCalendar = () => {
   const events        = useCalendarEventsStore((s) => s.events);
   const outlookEvents = usePlannerStore((s) => s.outlookEvents);
   const googleEvents  = usePlannerStore((s) => s.googleEvents);
+  const appleEvents   = usePlannerStore((s) => s.appleEvents);
 
   const visibleRange = useMemo(() => {
     if (view === ViewType.MONTH) {
@@ -71,14 +72,19 @@ export const useCalendar = () => {
       .filter((e) => e.date >= startStr && e.date <= endStr)
       .map((e) => ({ ...e, instanceDate: e.date }));
 
+    const appleInstances: EventInstance[] = appleEvents
+      .filter((e) => e.date >= startStr && e.date <= endStr)
+      .map((e) => ({ ...e, instanceDate: e.date }));
+
     // Keep a stable preference order for duplicate external events.
     const dedupedExternal = dedupeExternalInstances([
       ...googleInstances,
       ...outlookInstances,
+      ...appleInstances,
     ]);
 
     return [...localInstances, ...dedupedExternal];
-  }, [events, googleEvents, outlookEvents, visibleRange]);
+  }, [events, googleEvents, outlookEvents, appleEvents, visibleRange]);
 
   const filteredInstances = useMemo(() => {
     const query = searchQuery.toLowerCase();

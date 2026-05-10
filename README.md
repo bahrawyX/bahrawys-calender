@@ -7,7 +7,7 @@ A standalone, feature-rich calendar application built with Next.js, Tailwind CSS
 - **Month / Week / Day views** with smooth animated transitions
 - **Drag-and-drop** event rescheduling
 - **Recurring events** (daily, weekly, monthly, yearly) with full RFC 5545 support
-- **Google Calendar & Outlook integration** via OAuth 2.0
+- **Google Calendar, Outlook & Apple Calendar integration** via OAuth 2.0 / CalDAV
 - **Calendar filters** to toggle external calendars on/off
 - **Mobile-first responsive** design with swipe navigation
 - **Dark/Light theme** support
@@ -46,6 +46,16 @@ Then set:
 - `OUTLOOK_CLIENT_ID` / `OUTLOOK_CLIENT_SECRET` from [Azure Portal](https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps)
 - `INTEGRATION_SECRET` (run `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`)
 - `NEXT_PUBLIC_APP_URL` (your deployment URL)
+
+### Apple Calendar (iCloud)
+
+Apple Calendar uses CalDAV instead of OAuth -- no API keys needed! To connect:
+
+1. Go to [appleid.apple.com](https://appleid.apple.com)
+2. Sign in and navigate to **Sign-In and Security** > **App-Specific Passwords**
+3. Generate a new app-specific password (name it "Lumina Calendar" or similar)
+4. In the app, click **Apple Calendar** in the sidebar and enter your Apple ID email + the generated password
+5. Your iCloud calendars will sync automatically
 
 ## License
 

@@ -12,7 +12,7 @@ export async function POST(
 ) {
   const { provider } = await params;
 
-  if (provider !== 'google' && provider !== 'microsoft') {
+  if (provider !== 'google' && provider !== 'microsoft' && provider !== 'apple') {
     return NextResponse.json({ error: `Unknown provider: ${provider}` }, { status: 400 });
   }
 

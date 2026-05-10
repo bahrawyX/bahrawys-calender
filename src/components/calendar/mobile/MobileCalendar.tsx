@@ -46,6 +46,7 @@ export const MobileCalendar: React.FC = () => {
   const events = useCalendarEventsStore((s) => s.events);
   const outlookEvents = usePlannerStore((s) => s.outlookEvents);
   const googleEvents = usePlannerStore((s) => s.googleEvents);
+  const appleEvents = usePlannerStore((s) => s.appleEvents);
 
   // Month range for the visible grid — recompute once per month change.
   const monthRange = useMemo(() => {
@@ -60,11 +61,11 @@ export const MobileCalendar: React.FC = () => {
     const local = expandRecurrences(events, monthRange.start, monthRange.end);
     const startStr = formatDateISO(monthRange.start);
     const endStr = formatDateISO(monthRange.end);
-    const external: EventInstance[] = [...googleEvents, ...outlookEvents]
+    const external: EventInstance[] = [...googleEvents, ...outlookEvents, ...appleEvents]
       .filter((e) => e.date >= startStr && e.date <= endStr)
       .map((e) => ({ ...e, instanceDate: e.date }));
     return [...local, ...external];
-  }, [events, googleEvents, outlookEvents, monthRange]);
+  }, [events, googleEvents, outlookEvents, appleEvents, monthRange]);
 
   // Apply the same search / category / focus-mode filters the desktop
   // useCalendar hook applies, so filter state stays meaningful on mobile.

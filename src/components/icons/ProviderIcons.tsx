@@ -29,3 +29,15 @@ export const GoogleProviderIcon: React.FC<ProviderIconProps> = ({ size = 16, cla
     className={className}
   />
 );
+
+export const AppleProviderIcon: React.FC<ProviderIconProps> = ({ size = 16, className }) => (
+  // eslint-disable-next-line @next/next/no-img-element
+  <img
+    src="/svgs/providers/apple.svg"
+    alt="Apple"
+    width={size}
+    height={size}
+    className={className}
+    style={{ filter: 'var(--apple-icon-filter, none)' }}
+  />
+);

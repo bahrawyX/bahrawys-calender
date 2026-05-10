@@ -2,11 +2,12 @@ import { NextResponse } from 'next/server';
 import { getTokens, isConnected } from '@/lib/integrations/tokenStore';
 import { fetchGoogleCalendarList, refreshGoogleToken } from '@/lib/integrations/google';
 import { fetchMicrosoftCalendarList, refreshMicrosoftToken } from '@/lib/integrations/microsoft';
+import { fetchAppleCalendarList, type AppleCredentials } from '@/lib/integrations/apple';
 import { cookies } from 'next/headers';
 
 interface CalendarFilter {
   id: string;
-  provider: 'google' | 'microsoft';
+  provider: 'google' | 'microsoft' | 'apple';
   name: string;
   color: string;
   enabled: boolean;
@@ -111,6 +112,30 @@ export async function GET() {
           }
         } catch (err) {
           console.error('[calendars] Microsoft calendar list error:', err);
+        }
+      }
+    }
+
+    // Apple Calendar
+    if (await isConnected('apple')) {
+      const tokens = await getTokens('apple');
+      if (tokens) {
+        try {
+          const creds = JSON.parse(tokens.accessToken) as AppleCredentials;
+          const appleCals = await fetchAppleCalendarList(creds);
+          for (const cal of appleCals) {
+            const filterId = `apple:${cal.id}`;
+            calendars.push({
+              id: filterId,
+              provider: 'apple',
+              name: cal.name,
+              color: cal.color,
+              enabled: filtersState[filterId] !== false,
+              isPrimary: false,
+            });
+          }
+        } catch (err) {
+          console.error('[calendars] Apple calendar list error:', err);
         }
       }
     }

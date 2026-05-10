@@ -4,14 +4,15 @@
  * useExternalSync
  *
  * Syncs events from connected external providers (Google Calendar,
- * Outlook) into the planner store. Mirrors the original Lumina
- * useOutlookSync hook but works with the standalone cookie-based
+ * Outlook, Apple Calendar) into the planner store. Mirrors the original
+ * Lumina useOutlookSync hook but works with the standalone cookie-based
  * token store instead of a database backend.
  *
  * - Fetches events on mount and when the visible date range changes
  * - Polls every 10 minutes in the background
  * - Listens for `lumina:external-sync-now` custom events for forced sync
  * - Re-fetches on tab focus (debounced to 30s)
+ * - Injects a static demo event so users can see external events before connecting
  */
 import { useEffect, useRef, useCallback } from 'react';
 import { useCalendarStore } from '@/store/useCalendarStore';
@@ -55,10 +56,36 @@ function mapToCalendarEvent(e: any): CalendarEvent {
   };
 }
 
+/** Create a static demo Apple Calendar event for today. */
+function createDemoEvent(): CalendarEvent {
+  const today = new Date();
+  const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+  return {
+    id: 'demo_apple_event_001',
+    title: 'Team Standup',
+    description: 'Daily team sync — imported from Apple Calendar (demo)',
+    date: dateStr,
+    startTime: '14:00',
+    endTime: '14:45',
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    location: 'FaceTime',
+    category: 'External',
+    color: '#FF3B30', // Apple red
+    source: 'apple',
+    provider: 'apple',
+    readOnly: true,
+    editable: false,
+    draggable: false,
+    organizer: 'Apple Calendar (Demo)',
+  };
+}
+
 export function useExternalSync() {
   const currentDate = useCalendarStore((s) => s.currentDate);
   const setGoogleEvents = usePlannerStore((s) => s.setGoogleEvents);
   const setOutlookEvents = usePlannerStore((s) => s.setOutlookEvents);
+  const setAppleEvents = usePlannerStore((s) => s.setAppleEvents);
   const setIsSyncing = usePlannerStore((s) => s.setIsSyncing);
   const setSyncError = usePlannerStore((s) => s.setSyncError);
   const setLastSyncedAt = usePlannerStore((s) => s.setLastSyncedAt);
@@ -66,16 +93,26 @@ export function useExternalSync() {
   const lastFocusSyncRef = useRef(0);
   const lastRangeRef = useRef('');
 
+  // Inject demo event on mount
+  useEffect(() => {
+    const appleConnected = usePlannerStore.getState().appleConnected;
+    if (!appleConnected) {
+      // Show a demo Apple Calendar event so users can see what external events look like
+      setAppleEvents([createDemoEvent()]);
+    }
+  }, [setAppleEvents]);
+
   const syncEvents = useCallback(async () => {
     const range = getDateRange(currentDate);
     setIsSyncing(true);
     setSyncError(null);
 
     try {
-      // Fetch from both providers in parallel
-      const [googleRes, msRes] = await Promise.allSettled([
+      // Fetch from all providers in parallel
+      const [googleRes, msRes, appleRes] = await Promise.allSettled([
         fetch(`/api/external-events/google?start=${range.start}&end=${range.end}`),
         fetch(`/api/external-events/microsoft?start=${range.start}&end=${range.end}`),
+        fetch(`/api/external-events/apple?start=${range.start}&end=${range.end}`),
       ]);
 
       // Google
@@ -94,6 +131,20 @@ export function useExternalSync() {
         }
       }
 
+      // Apple
+      if (appleRes.status === 'fulfilled' && appleRes.value.ok) {
+        const data = await appleRes.value.json();
+        if (data.events && data.events.length > 0) {
+          setAppleEvents(data.events.map(mapToCalendarEvent));
+        }
+      } else {
+        // Keep demo event if Apple not connected
+        const appleConnected = usePlannerStore.getState().appleConnected;
+        if (!appleConnected) {
+          setAppleEvents([createDemoEvent()]);
+        }
+      }
+
       setLastSyncedAt(new Date().toISOString());
     } catch (err: any) {
       console.error('[useExternalSync] Sync error:', err);
@@ -101,7 +152,7 @@ export function useExternalSync() {
     } finally {
       setIsSyncing(false);
     }
-  }, [currentDate, setGoogleEvents, setOutlookEvents, setIsSyncing, setSyncError, setLastSyncedAt]);
+  }, [currentDate, setGoogleEvents, setOutlookEvents, setAppleEvents, setIsSyncing, setSyncError, setLastSyncedAt]);
 
   // Sync on mount and when date range changes
   useEffect(() => {

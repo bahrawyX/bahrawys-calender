@@ -35,8 +35,8 @@ export interface MeetingLink {
   provider: 'Lumina' | 'Zoom' | 'Meet' | 'Teams';
 }
 
-export type EventSource = 'lumina' | 'google' | 'microsoft' | 'outlook';
-export type EventProvider = 'local' | 'google' | 'microsoft' | 'outlook';
+export type EventSource = 'lumina' | 'google' | 'microsoft' | 'outlook' | 'apple';
+export type EventProvider = 'local' | 'google' | 'microsoft' | 'outlook' | 'apple';
 
 export interface CalendarEvent {
   id: string;

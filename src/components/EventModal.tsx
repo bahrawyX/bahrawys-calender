@@ -58,18 +58,23 @@ const EventModal: React.FC = () => {
   const localEvent = events.find((e) => e.id === selectedEventId);
   const outlookEvents = usePlannerStore((s) => s.outlookEvents);
   const googleEvents = usePlannerStore((s) => s.googleEvents);
+  const appleEvents = usePlannerStore((s) => s.appleEvents);
   const outlookEvent = outlookEvents.find((e) => e.id === selectedEventId);
   const googleEvent = googleEvents.find((e) => e.id === selectedEventId);
-  const activeEvent = localEvent || outlookEvent || googleEvent;
+  const appleEvent = appleEvents.find((e) => e.id === selectedEventId);
+  const activeEvent = localEvent || outlookEvent || googleEvent || appleEvent;
   const provider = activeEvent?.provider
     || (activeEvent?.source === 'outlook' || activeEvent?.source === 'microsoft'
       ? 'microsoft'
       : activeEvent?.source === 'google'
         ? 'google'
-        : 'local');
-  const isExternalEvent = provider === 'google' || provider === 'microsoft';
+        : activeEvent?.source === 'apple'
+          ? 'apple'
+          : 'local');
+  const isExternalEvent = provider === 'google' || provider === 'microsoft' || provider === 'apple';
   const isGoogleEvent = provider === 'google';
-  const externalColor = activeEvent?.color || (isGoogleEvent ? GOOGLE_BRAND_COLOR : OUTLOOK_BRAND_COLOR);
+  const isAppleEvent = provider === 'apple';
+  const externalColor = activeEvent?.color || (isAppleEvent ? '#FF3B30' : isGoogleEvent ? GOOGLE_BRAND_COLOR : OUTLOOK_BRAND_COLOR);
 
   const [formData, setFormData] = useState<Partial<CalendarEvent>>({
     title: "", description: "", date: "",
