@@ -7,7 +7,7 @@ export async function fetchAllForCurrentUser(): Promise<Goal[]> {
   return [];
 }
 
-export async function createOne(_input: Partial<Goal>): Promise<{ id?: string } | null> {
+export async function createOne(_input: Partial<Goal>): Promise<{ goalId?: string; targetIds?: string[] } | null> {
   return null;
 }
 

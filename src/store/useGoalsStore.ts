@@ -240,7 +240,7 @@ export const useGoalsStore = create<GoalsState>((set, get) => ({
       timeframe: input.timeframe,
       startDate: input.startDate,
       endDate: input.endDate,
-      targets: input.targets,
+      targets,
     }).then(data => {
       if (!data?.goalId) {
         notifyGoalIdResolved(goalId, null);
