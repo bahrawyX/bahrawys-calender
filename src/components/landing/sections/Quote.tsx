@@ -68,9 +68,15 @@ export function Quote() {
   /* Eyebrow: fades in during first 8% of scroll */
   const eyebrowOpacity = useTransform(scrollYProgress, [0, 0.08], [0, 1]);
   /* Attribution: fades in during last 15% */
-  const attrOpacity    = useTransform(scrollYProgress, [0.85, 1], [0, 1]);
+  const attrOpacity    = useTransform(scrollYProgress, [0.88, 0.98], [0, 1]);
 
   const words = QUOTE.split(" ");
+
+  // Compress word reveal to [0.08 → 0.86] so last words fully resolve
+  // before the section exits. Eyebrow covers [0, 0.08], attribution [0.86, 1].
+  const WORD_START = 0.08;
+  const WORD_END   = 0.86;
+  const wordSpan   = (WORD_END - WORD_START) / words.length;
 
   return (
     <section
@@ -111,8 +117,8 @@ export function Quote() {
             </span>
 
             {words.map((word, i) => {
-              const start = i / words.length;
-              const end   = start + 1 / words.length;
+              const start = WORD_START + i * wordSpan;
+              const end   = start + wordSpan;
               return (
                 <Word key={i} progress={scrollYProgress} range={[start, end]}>
                   {word}
