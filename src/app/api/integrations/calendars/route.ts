@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getTokens, isConnected } from '@/lib/integrations/tokenStore';
+import { getTokens, setTokens, isConnected } from '@/lib/integrations/tokenStore';
 import { fetchGoogleCalendarList, refreshGoogleToken } from '@/lib/integrations/google';
 import { fetchMicrosoftCalendarList, refreshMicrosoftToken } from '@/lib/integrations/microsoft';
 import { fetchAppleCalendarList, type AppleCredentials } from '@/lib/integrations/apple';
@@ -56,11 +56,16 @@ export async function GET() {
       const tokens = await getTokens('google');
       if (tokens) {
         let accessToken = tokens.accessToken;
-        // Refresh if expired
+        // Refresh if expired — re-persist the new token so future requests don't re-refresh
         if (tokens.expiresAt < Date.now() && tokens.refreshToken) {
           try {
             const refreshed = await refreshGoogleToken(tokens.refreshToken);
             accessToken = refreshed.access_token;
+            await setTokens('google', {
+              ...tokens,
+              accessToken: refreshed.access_token,
+              expiresAt: Date.now() + refreshed.expires_in * 1000,
+            });
           } catch {
             // Token refresh failed — skip Google
           }
@@ -93,6 +98,12 @@ export async function GET() {
           try {
             const refreshed = await refreshMicrosoftToken(tokens.refreshToken);
             accessToken = refreshed.access_token;
+            await setTokens('microsoft', {
+              ...tokens,
+              accessToken: refreshed.access_token,
+              refreshToken: refreshed.refresh_token ?? tokens.refreshToken,
+              expiresAt: Date.now() + refreshed.expires_in * 1000,
+            });
           } catch {
             // Token refresh failed — skip Microsoft
           }

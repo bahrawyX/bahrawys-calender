@@ -88,7 +88,10 @@ export async function validateAppleCredentials(creds: AppleCredentials): Promise
   }
 
   const xml = await res.text();
-  const principal = xmlVal(xml, 'href');
+  // iCloud's multistatus has multiple <href> tags; the first is the request path ("/").
+  // We must extract the href that is *inside* <current-user-principal>, not the first one.
+  const principalBlock = xmlVal(xml, 'current-user-principal');
+  const principal = principalBlock ? xmlVal(principalBlock, 'href') : null;
   if (!principal) {
     throw new Error('Could not discover CalDAV principal URL');
   }
@@ -225,21 +228,29 @@ export interface AppleEvent {
 }
 
 /**
+ * Unfold iCalendar line continuations per RFC 5545 §3.1.
+ * Lines longer than 75 octets are folded with CRLF + SPACE/TAB.
+ * Without unfolding, long SUMMARY/UID/DESCRIPTION values get silently truncated.
+ */
+function unfoldICS(icsData: string): string {
+  return icsData.replace(/\r\n[ \t]/g, '').replace(/\n[ \t]/g, '');
+}
+
+/**
  * Parse VEVENT components from iCalendar data.
  */
 function parseVEvents(icsData: string): AppleEvent[] {
   const events: AppleEvent[] = [];
-  const veventBlocks = icsData.match(/BEGIN:VEVENT[\s\S]*?END:VEVENT/gi) || [];
+  const unfolded = unfoldICS(icsData);
+  const veventBlocks = unfolded.match(/BEGIN:VEVENT[\s\S]*?END:VEVENT/gi) || [];
 
   for (const block of veventBlocks) {
     const getField = (name: string): string => {
-      // Handle properties with parameters like DTSTART;TZID=America/New_York:20260510T140000
-      const re = new RegExp(`^${name}(?:[;:][^\\n]*?):(.*?)$`, 'mi');
+      // Matches: NAME:value  OR  NAME;PARAM=x;...:value
+      // The colon that precedes the value may come after any number of ;PARAM=x segments.
+      const re = new RegExp(`^${name}(?:;[^:]*)?:(.*)$`, 'mi');
       const m = block.match(re);
-      if (!m) return '';
-      // Handle line folding (continuation lines start with space/tab)
-      let val = m[1].trim();
-      return val;
+      return m ? m[1].trim() : '';
     };
 
     const uid = getField('UID');

@@ -145,20 +145,21 @@ export async function GET(
 
         const msEvents = await fetchMicrosoftEvents(accessToken, cal.id, start, end);
         for (const me of msEvents) {
-          const startDt = new Date(me.start.dateTime + 'Z');
-          const endDt = new Date(me.end.dateTime + 'Z');
+          // Graph returns dateTime in the calendar's LOCAL timezone (not UTC).
+          // Appending 'Z' would incorrectly treat it as UTC and shift the time.
+          // Split the string directly to extract date and HH:mm components.
+          const [startDatePart, startTimePart] = me.start.dateTime.split('T');
+          const [endDatePart, endTimePart]     = me.end.dateTime.split('T');
+          const startHHmm = (startTimePart || '').slice(0, 5); // "HH:mm"
+          const endHHmm   = (endTimePart   || '').slice(0, 5);
 
           events.push({
             id: `ms_${me.id}`,
             title: me.subject || '(No title)',
             description: me.bodyPreview || '',
-            date: startDt.toISOString().split('T')[0],
-            startTime: me.isAllDay
-              ? ''
-              : `${String(startDt.getHours()).padStart(2, '0')}:${String(startDt.getMinutes()).padStart(2, '0')}`,
-            endTime: me.isAllDay
-              ? ''
-              : `${String(endDt.getHours()).padStart(2, '0')}:${String(endDt.getMinutes()).padStart(2, '0')}`,
+            date: startDatePart,
+            startTime: me.isAllDay ? '' : startHHmm,
+            endTime:   me.isAllDay ? '' : endHHmm,
             timezone: me.start.timeZone || Intl.DateTimeFormat().resolvedOptions().timeZone,
             location: me.location?.displayName,
             color: cal.color,

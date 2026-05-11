@@ -113,7 +113,9 @@ export async function fetchMicrosoftEvents(
   startDate: string,
   endDate: string,
 ): Promise<MicrosoftCalendarEvent[]> {
-  const filter = `start/dateTime ge '${startDate}T00:00:00' and end/dateTime le '${endDate}T23:59:59'`;
+  // Graph API requires RFC 3339 datetime literals with a timezone suffix in $filter.
+  // Without 'Z' some tenants reject the query with HTTP 400.
+  const filter = `start/dateTime ge '${startDate}T00:00:00Z' and end/dateTime le '${endDate}T23:59:59Z'`;
   const params = new URLSearchParams({
     $filter: filter,
     $orderby: 'start/dateTime',
