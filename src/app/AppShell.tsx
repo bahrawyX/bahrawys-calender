@@ -638,17 +638,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           e.preventDefault();
           if (e.shiftKey) redo();
           else undo();
+        } else if (pathname === "/calendar") {
+          if (key === "n") { e.preventDefault(); openModal(); }
+          else if (key === "t") { e.preventDefault(); setCurrentDate(new Date()); }
+          else if (key === "f") { e.preventDefault(); setFocusMode(!isFocusMode); }
+          else if (key === "m") { e.preventDefault(); setView(ViewType.MONTH); }
+          else if (key === "w") { e.preventDefault(); setView(ViewType.WEEK); }
+          else if (key === "d") { e.preventDefault(); setView(ViewType.DAY); }
         }
-        return;
-      }
-
-      if (pathname === "/calendar") {
-        if (key === "n") { e.preventDefault(); openModal(); }
-        else if (key === "t") { e.preventDefault(); setCurrentDate(new Date()); }
-        else if (key === "f") { e.preventDefault(); setFocusMode(!isFocusMode); }
-        else if (key === "m") { setView(ViewType.MONTH); }
-        else if (key === "w") { setView(ViewType.WEEK); }
-        else if (key === "d") { setView(ViewType.DAY); }
       }
     };
     window.addEventListener("keydown", handleKeyDown);

@@ -18,15 +18,15 @@ const GROUPS = [
     label: "Navigate",
     shortcuts: [
       { keys: ["←", "→"], desc: "prev / next week" },
-      { keys: ["T"], desc: "jump to today" },
+      { keys: ["Ctrl", "T"], desc: "jump to today" },
       { keys: ["↑", "↓"], desc: "scroll hours" },
     ],
   },
   {
     label: "Events",
     shortcuts: [
-      { keys: ["N"], desc: "new event" },
-      { keys: ["E"], desc: "edit selected" },
+      { keys: ["Ctrl", "N"], desc: "new event" },
+      { keys: ["Ctrl", "E"], desc: "edit selected" },
       { keys: ["⌫"], desc: "delete event" },
       { keys: ["Esc"], desc: "close / cancel" },
     ],
@@ -34,9 +34,9 @@ const GROUPS = [
   {
     label: "Views",
     shortcuts: [
-      { keys: ["M"], desc: "month view" },
-      { keys: ["W"], desc: "week view" },
-      { keys: ["D"], desc: "day view" },
+      { keys: ["Ctrl", "M"], desc: "month view" },
+      { keys: ["Ctrl", "W"], desc: "week view" },
+      { keys: ["Ctrl", "D"], desc: "day view" },
       { keys: ["1", "–", "6"], desc: "toggle contexts" },
     ],
   },
@@ -46,7 +46,7 @@ const GROUPS = [
 function Key({ label }: { label: string }) {
   return (
     <span
-      className="inline-grid place-items-center rounded-[7px] min-w-[2rem] h-8 px-2 text-[12px] font-medium select-none transition-all duration-100 active:scale-95"
+      className="inline-grid place-items-center rounded-[7px] min-w-[1.8rem] h-8 px-2.5 text-[11px] font-medium select-none transition-all duration-100 active:scale-95"
       style={{
         fontFamily: "var(--font-geist-mono), monospace",
         color: "var(--lp-kbd-text)",
