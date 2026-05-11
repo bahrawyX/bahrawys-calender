@@ -66,14 +66,14 @@ export function LandingNav() {
             type="button"
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             className="flex items-center gap-2 rounded-full px-2.5 py-1.5"
-            aria-label="Mina, scroll to top"
+            aria-label="Bahrawy Calendar, scroll to top"
           >
-            <MinaMark />
+            <BahrawyMark />
             <span
               className="text-[15px] font-medium tracking-[-0.02em]"
               style={{ fontFamily: "'ClashDisplay-Variable', sans-serif", color: "hsl(36 20% 96%)" }}
             >
-              Mina
+              Bahrawy
             </span>
           </button>
 
@@ -172,12 +172,12 @@ export function LandingNav() {
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <MinaMark />
+                <BahrawyMark />
                 <span
                   className="text-[17px] font-medium tracking-[-0.02em]"
                   style={{ fontFamily: "'ClashDisplay-Variable', sans-serif", color: "hsl(36 20% 96%)" }}
                 >
-                  Mina
+                  Bahrawy
                 </span>
               </div>
               <button
@@ -194,7 +194,7 @@ export function LandingNav() {
             </div>
 
             <nav className="mt-16 flex flex-col gap-2">
-              {[...links, { label: "Open Mina", href: "/calendar" }].map((l, i) => (
+              {[...links, { label: "Open Bahrawy", href: "/calendar" }].map((l, i) => (
                 <motion.div
                   key={l.label}
                   initial={{ opacity: 0, y: 24 }}
@@ -247,7 +247,7 @@ export function LandingNav() {
 }
 
 /* ─── Tiny brand mark ─────────────────────────────────────────────── */
-function MinaMark() {
+function BahrawyMark() {
   return (
     <span
       className="grid h-7 w-7 place-items-center rounded-[8px]"

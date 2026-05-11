@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Landing — Mina Scheduler marketing surface.
+ * Landing — Bahrawy Calendar marketing surface.
  *
  * Design language follows three layered skills:
  *   - emil-design-eng: motion philosophy (ease-out, transform/opacity only,

@@ -15,7 +15,7 @@ export function LandingFooter() {
     >
       <div className="mx-auto max-w-7xl py-10 sm:py-12 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8">
         <div className="flex items-center gap-3">
-          <MinaMark />
+          <BahrawyMark />
           <div className="flex flex-col leading-tight">
             <span
               className="text-[15px] font-medium tracking-[-0.018em]"
@@ -24,7 +24,7 @@ export function LandingFooter() {
                 color: "hsl(36 22% 92%)",
               }}
             >
-              Mina
+              Bahrawy
             </span>
             <span
               className="text-[11px] tracking-[0.04em]"
@@ -60,13 +60,13 @@ export function LandingFooter() {
             </svg>
           </a>
           <a
-            href="https://mina-scheduler.vercel.app"
+            href="https://bahrawys-calender.vercel.app"
             target="_blank"
             rel="noopener noreferrer"
             className="transition-colors flex items-center gap-1.5"
             style={{ color: "hsl(36 14% 76%)" }}
           >
-            mina-scheduler.vercel.app
+            bahrawys-calender.vercel.app
             <svg width={11} height={11} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round">
               <line x1="7" y1="17" x2="17" y2="7" />
               <polyline points="9 7 17 7 17 15" />
@@ -78,7 +78,7 @@ export function LandingFooter() {
   );
 }
 
-function MinaMark() {
+function BahrawyMark() {
   return (
     <span
       className="grid h-8 w-8 place-items-center rounded-[9px]"

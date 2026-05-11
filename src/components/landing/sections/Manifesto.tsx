@@ -48,7 +48,7 @@ export function Manifesto() {
               className="mt-8 max-w-[44ch] text-base sm:text-[17px] leading-[1.6]"
               style={{ color: "hsl(36 12% 68%)" }}
             >
-              Mina was designed to be closed. The grid loads in under a hundred
+              Bahrawy was designed to be closed. The grid loads in under a hundred
               milliseconds, the keyboard is the primary input, and your data
               stays in the browser tab where you put it.
             </p>

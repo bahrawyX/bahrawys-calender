@@ -104,7 +104,7 @@ export function About() {
                 style={{ color: "hsl(36 12% 70%)" }}
               >
                 I&apos;m a software engineer who keeps ending up building the
-                tools I wish existed. Mina is one of those: a calendar I could
+                tools I wish existed. This is one of those: a calendar I could
                 live inside, fast enough to disappear, honest enough to stay.
                 If you&apos;re curious about the rest of what I&apos;m making,
                 the journal lives at bahrawy.me.

@@ -49,7 +49,7 @@ export function FinalCta() {
                   color: "hsl(36 28% 97%)",
                 }}
               >
-                Open Mina.{" "}
+                Open Bahrawy.{" "}
                 <span style={{ color: "hsl(36 16% 64%)" }}>It loads before you read this.</span>
               </h2>
 
@@ -71,7 +71,7 @@ export function FinalCta() {
                       "0 1px 0 hsl(0 0% 100% / 0.7) inset, 0 0 0 1px hsl(0 0% 100% / 0.1), 0 28px 60px -20px hsl(249 70% 55% / 0.5)",
                   }}
                 >
-                  <span>Open Mina</span>
+                  <span>Open Bahrawy</span>
                   <span
                     className="grid h-10 w-10 place-items-center rounded-full transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-[1px]"
                     style={{

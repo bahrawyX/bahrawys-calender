@@ -49,7 +49,7 @@ export function Hero() {
               color: "hsl(36 14% 78%)",
             }}
           >
-            Mina · v1 · live
+            Bahrawy · v1 · live
           </span>
         </motion.div>
 
@@ -88,7 +88,7 @@ export function Hero() {
           transition={{ duration: 0.7, ease: EASE_OUT_QUART, delay: 1.1 }}
           className="mt-10 sm:mt-12 flex flex-wrap items-center gap-3"
         >
-          <PrimaryCta href="/calendar">Open Mina</PrimaryCta>
+          <PrimaryCta href="/calendar">Open Bahrawy</PrimaryCta>
           <SecondaryCta href="https://www.bahrawy.me" external>
             Meet the maker
           </SecondaryCta>
@@ -413,7 +413,7 @@ const MOCK_EVENTS = [
   { day: 4, title: "1:1 Sam", color: "#10B981" },
   { day: 6, title: "Deep work", color: "#6D59E0" },
   { day: 8, title: "Ship v1.2", color: "#F59E0B" },
-  { day: 10, title: "Demo · Mina", color: "#6D59E0" },
+  { day: 10, title: "Demo · Bahrawy", color: "#6D59E0" },
   { day: 10, title: "Lunch", color: "#10B981" },
   { day: 12, title: "Workshop", color: "#EC4899" },
   { day: 14, title: "Review", color: "#475569" },

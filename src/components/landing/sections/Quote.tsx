@@ -57,7 +57,7 @@ export function Quote() {
                 color: "hsl(36 12% 64%)",
               }}
             >
-              Mina · design principle № 1
+              Bahrawy · design principle № 1
             </span>
           </div>
         </Reveal>
