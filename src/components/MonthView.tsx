@@ -7,6 +7,7 @@ import { DAYS } from '../constants';
 import { useCalendarStore } from '../store/useCalendarStore';
 import { useCalendarEventsStore } from '../store/useCalendarEventsStore';
 import EventItem from './EventItem';
+import { EventProviderBadge } from './EventProviderBadge';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { ScrollArea } from './ui/scroll-area';
 import { useIsLaptopWidth } from '../hooks/useIsLaptopWidth';
@@ -95,29 +96,43 @@ const OverflowPopover = memo<{
       </div>
       <ScrollArea className="h-[300px]">
         <div className="p-2 space-y-0.5">
-          {dayEvents.map((ev) => (
-            <button
-              key={ev.id}
-              type="button"
-              onClick={(e) => { e.stopPropagation(); onOpenChange(false); onEventClick(ev.id); }}
-              className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-muted/60 transition-colors duration-100 text-left cursor-pointer"
-            >
-              <span
-                className="w-2 h-2 rounded-full flex-shrink-0"
-                style={{ backgroundColor: ev.color ?? 'hsl(var(--primary))' }}
-              />
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium text-foreground truncate leading-tight">
-                  {ev.title}
-                </p>
-                {ev.startTime && (
-                  <p className="text-[10px] text-muted-foreground leading-tight mt-0.5">
-                    {fmtTime(ev.startTime)}
+          {dayEvents.map((ev) => {
+            const evProvider: 'google' | 'microsoft' | 'apple' | 'local' =
+              ev.provider === 'google' || ev.provider === 'microsoft' || ev.provider === 'apple'
+                ? ev.provider
+                : ev.source === 'outlook' || ev.source === 'microsoft'
+                  ? 'microsoft'
+                  : ev.source === 'google'
+                    ? 'google'
+                    : ev.source === 'apple'
+                      ? 'apple'
+                      : 'local';
+            return (
+              <button
+                key={ev.id}
+                type="button"
+                onClick={(e) => { e.stopPropagation(); onOpenChange(false); onEventClick(ev.id); }}
+                className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-muted/60 transition-colors duration-100 text-left cursor-pointer"
+              >
+                <EventProviderBadge
+                  provider={evProvider}
+                  category={ev.category}
+                  color={ev.color ?? 'hsl(var(--primary))'}
+                  size={18}
+                />
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-medium text-foreground truncate leading-tight">
+                    {ev.title}
                   </p>
-                )}
-              </div>
-            </button>
-          ))}
+                  {ev.startTime && (
+                    <p className="text-[10px] text-muted-foreground leading-tight mt-0.5">
+                      {fmtTime(ev.startTime)}
+                    </p>
+                  )}
+                </div>
+              </button>
+            );
+          })}
         </div>
       </ScrollArea>
     </PopoverContent>

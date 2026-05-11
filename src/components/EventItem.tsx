@@ -3,8 +3,8 @@
 import React, { memo } from 'react';
 import { CalendarEvent } from '../types';
 import { EVENT_COLORS } from '../constants';
-import { GoogleProviderIcon, OutlookProviderIcon, RepeatIcon } from './icons';
-import { AppleProviderIcon } from './icons/ProviderIcons';
+import { RepeatIcon } from './icons';
+import { EventProviderBadge } from './EventProviderBadge';
 
 /* ── Provider theming ────────────────────────────────────────────────────────
  * Each external provider gets a tinted gradient card matching its brand
@@ -98,11 +98,6 @@ const EventItem = memo<EventItemProps>(({ event, onClick, compact }) => {
   /* ── External (Apple / Google / Outlook) — compact card ─────────── */
   if (compact && isExternal) {
     const theme = getProviderTheme(provider as ExternalProvider);
-    const ProviderIcon = provider === 'apple'
-      ? AppleProviderIcon
-      : provider === 'google'
-        ? GoogleProviderIcon
-        : OutlookProviderIcon;
     return (
       <button
         draggable={false}
@@ -113,7 +108,7 @@ const EventItem = memo<EventItemProps>(({ event, onClick, compact }) => {
           border: `1px solid rgba(${theme.rgb},0.22)`,
         }}
       >
-        <ProviderIcon size={13} className={`flex-shrink-0 ${theme.iconClassName}`} />
+        <EventProviderBadge provider={provider as 'google' | 'microsoft' | 'apple'} size={15} />
         <span
           className="truncate text-[11px] min-[1400px]:text-[12px] font-medium leading-none"
           style={{ color: theme.accent }}
@@ -127,11 +122,6 @@ const EventItem = memo<EventItemProps>(({ event, onClick, compact }) => {
   /* ── External (Apple / Google / Outlook) — normal card ──────────── */
   if (isExternal) {
     const theme = getProviderTheme(provider as ExternalProvider);
-    const ProviderIcon = provider === 'apple'
-      ? AppleProviderIcon
-      : provider === 'google'
-        ? GoogleProviderIcon
-        : OutlookProviderIcon;
     return (
       <button
         draggable={false}
@@ -143,18 +133,21 @@ const EventItem = memo<EventItemProps>(({ event, onClick, compact }) => {
           boxShadow: `0 1px 3px rgba(${theme.rgb},0.10)`,
         }}
       >
-        <span
-          className="truncate text-[11px] font-semibold leading-tight flex items-center gap-1.5"
-          style={{ color: theme.accent }}
-        >
-          <ProviderIcon size={14} className={`flex-shrink-0 ${theme.iconClassName}`} />
+        <span className="flex items-center gap-1.5 min-w-0">
+          <EventProviderBadge provider={provider as 'google' | 'microsoft' | 'apple'} size={16} />
           {isRecurring && (
             <RepeatIcon
               size={10}
               className={`flex-shrink-0 ${event.isRecurrenceException ? 'opacity-100' : 'opacity-50'}`}
+              style={{ color: theme.accent }}
             />
           )}
-          {event.title}
+          <span
+            className="truncate text-[11px] font-semibold leading-tight"
+            style={{ color: theme.accent }}
+          >
+            {event.title}
+          </span>
         </span>
         {timeLabel && (
           <span
@@ -199,10 +192,7 @@ const EventItem = memo<EventItemProps>(({ event, onClick, compact }) => {
         className="w-full text-left flex items-center gap-1.5 px-2 py-1.5 min-[1400px]:gap-2 min-[1400px]:px-2.5 min-[1400px]:py-2 rounded-lg transition-all duration-100 group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer hover:-translate-y-[1px]"
         style={localCardStyle}
       >
-        <span
-          className="w-1.5 h-1.5 min-[1400px]:w-2 min-[1400px]:h-2 rounded-full flex-shrink-0"
-          style={{ backgroundColor: color }}
-        />
+        <EventProviderBadge provider="local" category={event.category} color={color} size={15} />
         <span
           className="truncate text-[11px] min-[1400px]:text-[12px] font-semibold leading-none"
           style={{ color, opacity: event.completed ? 0.45 : 1 }}
@@ -222,16 +212,23 @@ const EventItem = memo<EventItemProps>(({ event, onClick, compact }) => {
       style={localCardStyle}
     >
       <span
-        className="truncate text-[11px] font-semibold leading-tight flex items-center gap-1.5"
-        style={{ color, opacity: event.completed ? 0.45 : 1 }}
+        className="flex items-center gap-1.5 min-w-0"
+        style={{ opacity: event.completed ? 0.45 : 1 }}
       >
+        <EventProviderBadge provider="local" category={event.category} color={color} size={16} />
         {isRecurring && (
           <RepeatIcon
             size={10}
             className={`flex-shrink-0 ${event.isRecurrenceException ? 'opacity-100' : 'opacity-50'}`}
+            style={{ color }}
           />
         )}
-        {event.title}
+        <span
+          className="truncate text-[11px] font-semibold leading-tight"
+          style={{ color }}
+        >
+          {event.title}
+        </span>
       </span>
       {timeLabel && (
         <span
