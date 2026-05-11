@@ -32,13 +32,13 @@ export function FinalCta() {
                 boxShadow: "0 1px 0 hsl(0 0% 100% / 0.1) inset",
               }}
             >
-              {/* Soft ambient orb */}
+              {/* Ambient orb — radiates downward from the top edge */}
               <div
                 aria-hidden
-                className="pointer-events-none absolute inset-x-0 -top-32 h-64"
+                className="pointer-events-none absolute inset-x-0 top-0 h-72"
                 style={{
                   background:
-                    "radial-gradient(40% 100% at 50% 100%, hsl(249 66% 56% / 0.22), transparent 70%)",
+                    "radial-gradient(70% 100% at 50% 0%, hsl(249 66% 56% / 0.38), transparent 100%)",
                 }}
               />
 
@@ -71,7 +71,7 @@ export function FinalCta() {
                       "0 1px 0 hsl(0 0% 100% / 0.7) inset, 0 0 0 1px hsl(0 0% 100% / 0.1), 0 28px 60px -20px hsl(249 66% 50% / 0.3)",
                   }}
                 >
-                  <span>Open Bahrawy</span>
+                  <span>Open the calendar</span>
                   <span
                     className="grid h-10 w-10 place-items-center rounded-full transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-[1px]"
                     style={{
