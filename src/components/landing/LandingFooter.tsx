@@ -83,8 +83,8 @@ function BahrawyMark() {
     <span
       className="grid h-8 w-8 place-items-center rounded-[9px]"
       style={{
-        background: "linear-gradient(135deg, hsl(249 70% 65%), hsl(280 60% 55%))",
-        boxShadow: "0 0 16px hsl(249 70% 60% / 0.3), inset 0 1px 0 hsl(0 0% 100% / 0.2)",
+        background: "linear-gradient(135deg, hsl(249 66% 64%), hsl(268 60% 54%))",
+        boxShadow: "0 0 14px hsl(249 66% 58% / 0.2), inset 0 1px 0 hsl(0 0% 100% / 0.2)",
       }}
       aria-hidden
     >

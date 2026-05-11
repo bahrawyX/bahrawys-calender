@@ -55,7 +55,7 @@ export function Landing() {
         style={{
           // Restrained dark color strategy — tinted toward the brand purple
           // instead of pure neutral. Closer to OLED than pure black.
-          background: "hsl(248 14% 5%)",
+          background: "hsl(240 8% 8%)",
           fontFamily: "var(--font-geist-sans), -apple-system, BlinkMacSystemFont, sans-serif",
           letterSpacing: "-0.011em",
         }}
@@ -103,9 +103,9 @@ function AmbientGlow() {
         className="pointer-events-none fixed inset-0 z-[1]"
         style={{
           background:
-            "radial-gradient(60rem 50rem at 20% 0%, hsl(249 70% 50% / 0.18), transparent 60%), " +
-            "radial-gradient(50rem 40rem at 100% 30%, hsl(280 65% 55% / 0.12), transparent 55%), " +
-            "radial-gradient(40rem 30rem at 40% 90%, hsl(220 60% 50% / 0.10), transparent 50%)",
+            "radial-gradient(60rem 50rem at 20% 0%, hsl(249 66% 45% / 0.07), transparent 60%), " +
+            "radial-gradient(50rem 40rem at 100% 30%, hsl(262 58% 48% / 0.05), transparent 55%), " +
+            "radial-gradient(40rem 30rem at 40% 90%, hsl(225 50% 42% / 0.04), transparent 50%)",
         }}
       />
       {/* Grain — fixed pseudo-layer via data-URI SVG, no HTTP request.

@@ -24,14 +24,14 @@ export function About() {
               style={{
                 background: "linear-gradient(180deg, hsl(0 0% 100% / 0.08), hsl(0 0% 100% / 0.02))",
                 border: "1px solid hsl(0 0% 100% / 0.08)",
-                boxShadow: "0 30px 80px -28px hsl(249 70% 30% / 0.5)",
+                boxShadow: "0 30px 80px -28px hsl(249 66% 26% / 0.28)",
               }}
             >
               <div
                 className="aspect-square rounded-[calc(1.5rem-0.375rem)] flex items-center justify-center overflow-hidden relative"
                 style={{
                   background:
-                    "radial-gradient(80% 80% at 30% 20%, hsl(249 50% 30%), hsl(248 16% 7%) 75%)",
+                    "radial-gradient(80% 80% at 30% 20%, hsl(249 45% 26%), hsl(240 7% 7%) 75%)",
                   boxShadow: "0 1px 0 hsl(0 0% 100% / 0.1) inset",
                 }}
               >
@@ -127,9 +127,9 @@ export function About() {
                 <span
                   className="grid h-9 w-9 place-items-center rounded-full transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-[1px]"
                   style={{
-                    background: "linear-gradient(135deg, hsl(249 70% 60%), hsl(280 60% 50%))",
+                    background: "linear-gradient(135deg, hsl(249 66% 61%), hsl(264 60% 52%))",
                     color: "hsl(36 28% 98%)",
-                    boxShadow: "0 0 18px hsl(249 70% 55% / 0.3)",
+                    boxShadow: "0 0 18px hsl(249 66% 54% / 0.2)",
                   }}
                 >
                   <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">

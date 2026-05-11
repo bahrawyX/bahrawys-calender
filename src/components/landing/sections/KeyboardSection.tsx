@@ -50,7 +50,7 @@ function Key({ label }: { label: string }) {
       style={{
         fontFamily: "var(--font-geist-mono), monospace",
         color: "hsl(36 20% 92%)",
-        background: "linear-gradient(180deg, hsl(248 16% 14%), hsl(248 14% 10%))",
+        background: "linear-gradient(180deg, hsl(240 8% 13%), hsl(240 7% 10%))",
         border: "1px solid hsl(0 0% 100% / 0.1)",
         boxShadow:
           "0 1px 0 hsl(0 0% 100% / 0.12) inset, 0 2px 0 hsl(0 0% 0% / 0.4)",
@@ -125,7 +125,7 @@ export function KeyboardSection() {
                   className="rounded-[calc(1.5rem-0.375rem)] px-6 sm:px-8 py-6"
                   style={{
                     background:
-                      "linear-gradient(180deg, hsl(248 14% 8%), hsl(248 12% 6%))",
+                      "linear-gradient(180deg, hsl(240 7% 10%), hsl(240 6% 7%))",
                     boxShadow: "0 1px 0 hsl(0 0% 100% / 0.06) inset",
                   }}
                 >

@@ -54,7 +54,7 @@ export function LandingNav() {
           className="pointer-events-auto mt-5 sm:mt-7 flex items-center gap-1 rounded-full border px-2 py-1.5 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.35)]"
           style={{
             // Adaptive opacity: tighter glass when scrolled, lighter at top
-            backgroundColor: scrolled ? "hsl(248 14% 7% / 0.72)" : "hsl(248 14% 8% / 0.42)",
+            backgroundColor: scrolled ? "hsl(240 7% 8% / 0.78)" : "hsl(240 7% 9% / 0.45)",
             borderColor: "hsl(0 0% 100% / 0.08)",
             backdropFilter: "blur(16px) saturate(140%)",
             WebkitBackdropFilter: "blur(16px) saturate(140%)",
@@ -165,7 +165,7 @@ export function LandingNav() {
             transition={{ duration: 0.32, ease: EASE_OUT_QUART }}
             className="fixed inset-0 z-[60] flex flex-col px-6 pt-6"
             style={{
-              backgroundColor: "hsl(248 14% 5% / 0.92)",
+              backgroundColor: "hsl(240 8% 7% / 0.94)",
               backdropFilter: "blur(28px) saturate(180%)",
               WebkitBackdropFilter: "blur(28px) saturate(180%)",
             }}
@@ -252,8 +252,8 @@ function BahrawyMark() {
     <span
       className="grid h-7 w-7 place-items-center rounded-[8px]"
       style={{
-        background: "linear-gradient(135deg, hsl(249 70% 65%), hsl(280 60% 55%))",
-        boxShadow: "0 0 16px hsl(249 70% 60% / 0.35), inset 0 1px 0 hsl(0 0% 100% / 0.18)",
+        background: "linear-gradient(135deg, hsl(249 66% 64%), hsl(268 60% 54%))",
+        boxShadow: "0 0 14px hsl(249 66% 58% / 0.25), inset 0 1px 0 hsl(0 0% 100% / 0.18)",
       }}
       aria-hidden
     >

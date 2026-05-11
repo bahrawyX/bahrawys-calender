@@ -103,7 +103,7 @@ export function Hero() {
         aria-hidden
         className="pointer-events-none absolute inset-x-0 bottom-0 h-24"
         style={{
-          background: "linear-gradient(to bottom, transparent, hsl(248 14% 5%))",
+          background: "linear-gradient(to bottom, transparent, hsl(240 8% 8%))",
         }}
       />
     </section>
@@ -247,7 +247,7 @@ function CalendarMock() {
           style={{
             background: "linear-gradient(180deg, hsl(0 0% 100% / 0.06), hsl(0 0% 100% / 0.02))",
             boxShadow:
-              "0 1px 0 hsl(0 0% 100% / 0.08) inset, 0 60px 120px -40px hsl(249 70% 30% / 0.5), 0 30px 60px -20px hsl(0 0% 0% / 0.55)",
+              "0 1px 0 hsl(0 0% 100% / 0.08) inset, 0 60px 120px -40px hsl(249 66% 26% / 0.28), 0 30px 60px -20px hsl(0 0% 0% / 0.5)",
             border: "1px solid hsl(0 0% 100% / 0.08)",
           }}
         >
@@ -255,7 +255,7 @@ function CalendarMock() {
           <div
             className="rounded-[calc(2rem-0.375rem)] overflow-hidden"
             style={{
-              background: "linear-gradient(180deg, hsl(248 14% 8%), hsl(248 12% 6%))",
+              background: "linear-gradient(180deg, hsl(240 7% 10%), hsl(240 6% 7%))",
               boxShadow: "0 1px 0 hsl(0 0% 100% / 0.06) inset",
             }}
           >
@@ -366,7 +366,7 @@ function CalendarMock() {
           transition={{ duration: 1, ease: EASE_OUT_QUART, delay: 0.9 }}
           className="absolute -bottom-6 -left-3 sm:-left-8 hidden sm:flex items-center gap-2 rounded-full px-3.5 py-2.5"
           style={{
-            background: "hsl(248 14% 9% / 0.95)",
+            background: "hsl(240 7% 9% / 0.95)",
             border: "1px solid hsl(0 0% 100% / 0.08)",
             boxShadow: "0 22px 50px -16px hsl(0 0% 0% / 0.6)",
             backdropFilter: "blur(12px)",

@@ -18,17 +18,17 @@ export function FinalCta() {
             className="relative rounded-[2rem] p-1.5"
             style={{
               background:
-                "linear-gradient(180deg, hsl(249 70% 50% / 0.15), hsl(280 60% 45% / 0.05))",
-              border: "1px solid hsl(249 70% 65% / 0.18)",
+                "linear-gradient(180deg, hsl(249 66% 48% / 0.12), hsl(264 58% 42% / 0.04))",
+              border: "1px solid hsl(249 66% 64% / 0.15)",
               boxShadow:
-                "0 60px 120px -40px hsl(249 70% 30% / 0.5), 0 1px 0 hsl(0 0% 100% / 0.08) inset",
+                "0 60px 120px -40px hsl(249 66% 26% / 0.28), 0 1px 0 hsl(0 0% 100% / 0.08) inset",
             }}
           >
             <div
               className="rounded-[calc(2rem-0.375rem)] py-20 sm:py-28 lg:py-32 px-8 sm:px-12 text-center overflow-hidden relative"
               style={{
                 background:
-                  "radial-gradient(80% 60% at 50% 0%, hsl(249 40% 18%), hsl(248 14% 6%) 70%)",
+                  "radial-gradient(80% 60% at 50% 0%, hsl(249 35% 15%), hsl(240 7% 7%) 70%)",
                 boxShadow: "0 1px 0 hsl(0 0% 100% / 0.1) inset",
               }}
             >
@@ -38,7 +38,7 @@ export function FinalCta() {
                 className="pointer-events-none absolute inset-x-0 -top-32 h-64"
                 style={{
                   background:
-                    "radial-gradient(40% 100% at 50% 100%, hsl(249 80% 60% / 0.4), transparent 70%)",
+                    "radial-gradient(40% 100% at 50% 100%, hsl(249 66% 56% / 0.22), transparent 70%)",
                 }}
               />
 
@@ -68,7 +68,7 @@ export function FinalCta() {
                     background: "linear-gradient(180deg, hsl(36 30% 98%), hsl(36 22% 92%))",
                     color: "hsl(248 30% 8%)",
                     boxShadow:
-                      "0 1px 0 hsl(0 0% 100% / 0.7) inset, 0 0 0 1px hsl(0 0% 100% / 0.1), 0 28px 60px -20px hsl(249 70% 55% / 0.5)",
+                      "0 1px 0 hsl(0 0% 100% / 0.7) inset, 0 0 0 1px hsl(0 0% 100% / 0.1), 0 28px 60px -20px hsl(249 66% 50% / 0.3)",
                   }}
                 >
                   <span>Open Bahrawy</span>

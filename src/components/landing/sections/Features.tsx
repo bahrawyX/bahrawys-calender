@@ -152,17 +152,17 @@ function FeatureCore({
     tone === "purple"
       ? {
           background:
-            "radial-gradient(120% 100% at 0% 0%, hsl(249 50% 22% / 0.7), hsl(248 16% 8%) 60%)",
+            "radial-gradient(120% 100% at 0% 0%, hsl(249 45% 20% / 0.6), hsl(240 7% 8%) 60%)",
           boxShadow:
-            "0 1px 0 hsl(0 0% 100% / 0.08) inset, 0 0 80px -20px hsl(249 70% 50% / 0.4) inset",
+            "0 1px 0 hsl(0 0% 100% / 0.08) inset, 0 0 80px -20px hsl(249 66% 48% / 0.28) inset",
         }
       : tone === "dim"
         ? {
-            background: "linear-gradient(180deg, hsl(248 12% 7%), hsl(248 10% 5%))",
+            background: "linear-gradient(180deg, hsl(240 7% 8%), hsl(240 5% 6%))",
             boxShadow: "0 1px 0 hsl(0 0% 100% / 0.04) inset",
           }
         : {
-            background: "linear-gradient(180deg, hsl(248 14% 8%), hsl(248 12% 6%))",
+            background: "linear-gradient(180deg, hsl(240 7% 10%), hsl(240 6% 7%))",
             boxShadow: "0 1px 0 hsl(0 0% 100% / 0.06) inset",
           };
 
@@ -316,7 +316,7 @@ function DragMockup() {
       <div
         className="absolute -top-3 right-2 rounded-full px-3 py-1.5 text-[10px] font-medium flex items-center gap-1.5"
         style={{
-          background: "hsl(248 14% 9% / 0.95)",
+          background: "hsl(240 7% 9% / 0.95)",
           border: "1px solid hsl(249 70% 65% / 0.4)",
           color: "hsl(36 20% 92%)",
           boxShadow: "0 12px 30px -10px hsl(0 0% 0% / 0.5)",

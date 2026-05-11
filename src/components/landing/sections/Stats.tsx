@@ -79,14 +79,14 @@ export function Stats() {
                 "linear-gradient(180deg, hsl(0 0% 100% / 0.06), hsl(0 0% 100% / 0.02))",
               border: "1px solid hsl(0 0% 100% / 0.07)",
               boxShadow:
-                "0 40px 80px -30px hsl(249 70% 20% / 0.35), 0 1px 0 hsl(0 0% 100% / 0.06) inset",
+                "0 40px 80px -30px hsl(249 66% 18% / 0.22), 0 1px 0 hsl(0 0% 100% / 0.06) inset",
             }}
           >
             <div
               className="rounded-[calc(1.75rem-0.375rem)] px-8 sm:px-14 py-10 sm:py-12 grid grid-cols-1 sm:grid-cols-3 gap-10 sm:gap-0"
               style={{
                 background:
-                  "radial-gradient(120% 200% at 50% 0%, hsl(249 30% 12% / 0.6), hsl(248 14% 7%) 55%)",
+                  "radial-gradient(120% 200% at 50% 0%, hsl(249 25% 11% / 0.5), hsl(240 7% 8%) 55%)",
                 boxShadow: "0 1px 0 hsl(0 0% 100% / 0.07) inset",
               }}
             >
