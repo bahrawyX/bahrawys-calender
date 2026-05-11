@@ -1,55 +1,57 @@
 "use client";
 
 /**
- * Quote — Apple-style scroll-to-read word reveal.
+ * Quote — scroll-to-read with blur + opacity per word.
  *
- * Adapted from the 21st.dev TextRevealByWord pattern:
- *   - 300vh container makes room for word-by-word scroll travel
- *   - Inner text is sticky (100dvh), stays centered as you scroll
- *   - Each word maps its opacity 0.08 → 1 over its slice of scrollYProgress
- *   - Background dim colour: hsl(36 10% 22%) → bright hsl(36 28% 97%)
+ * Based on the ScrollRevealText variant:
+ *   - Each word animates from blur(10px)/opacity(0) → blur(0px)/opacity(1)
+ *   - offset ["start start","end start"]: scroll range = 1 sticky section height
+ *   - blur driven via useMotionTemplate (reactive, not .get() snapshot)
  *
- * Anti-pattern: NO gradient text. Word "colour" is a plain opacity shift.
+ * Container: h-[300vh], sticky inner: h-[100dvh]
  */
 
-import { useRef } from "react";
-import { motion, useScroll, useTransform, type MotionValue } from "framer-motion";
+import { useRef, type FC } from "react";
+import {
+  motion,
+  useScroll,
+  useTransform,
+  useMotionTemplate,
+  type MotionValue,
+} from "framer-motion";
 
 /* ─── Data ────────────────────────────────────────────────────────── */
-const WORDS =
-  "Calendars should fade out of the way when you don't need them, and appear right before you do.".split(" ");
+const QUOTE =
+  "Calendars should fade out of the way when you don't need them, and appear right before you do.";
 
-/* ─── Single animated word ────────────────────────────────────────── */
-function Word({
-  word,
-  progress,
-  range,
-}: {
-  word: string;
+/* ─── Single word ─────────────────────────────────────────────────── */
+interface WordProps {
+  children: string;
   progress: MotionValue<number>;
   range: [number, number];
-}) {
-  const opacity = useTransform(progress, range, [0.1, 1]);
-  return (
-    <span className="relative inline-block mr-[0.22em]">
-      {/* Dim ghost — always visible so layout doesn't shift */}
-      <span
-        aria-hidden
-        className="select-none"
-        style={{ color: "hsl(36 10% 24%)" }}
-      >
-        {word}
-      </span>
-      {/* Bright overlay — animated */}
-      <motion.span
-        className="absolute inset-0"
-        style={{ opacity, color: "hsl(36 28% 97%)" }}
-      >
-        {word}
-      </motion.span>
-    </span>
-  );
 }
+
+const Word: FC<WordProps> = ({ children, progress, range }) => {
+  const opacity = useTransform(progress, range, [0, 1]);
+  const blurPx  = useTransform(progress, range, [10, 0]);
+  // useMotionTemplate keeps the filter reactive on every frame
+  const filter  = useMotionTemplate`blur(${blurPx}px)`;
+
+  return (
+    <motion.span
+      className="relative inline-block"
+      style={{
+        opacity,
+        filter,
+        marginRight: "0.22em",
+        color: "hsl(36 28% 97%)",
+        willChange: "opacity, filter",
+      }}
+    >
+      {children}
+    </motion.span>
+  );
+};
 
 /* ─── Section ─────────────────────────────────────────────────────── */
 export function Quote() {
@@ -57,21 +59,26 @@ export function Quote() {
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    // default offset: ["start end", "end start"] — gives ~300vh of travel
-    // which means each of ~20 words gets ~15vh of comfortable scroll range
+    // "start start" → sticky pins when container.top = viewport.top
+    // "end start"   → progress reaches 1 when container.bottom = viewport.top
+    // With h-[300vh], that's 200vh of scroll to reveal all words — ~10vh/word
+    offset: ["start start", "end start"],
   });
 
-  /* Eyebrow and attribution fade independently */
-  const eyebrowOpacity  = useTransform(scrollYProgress, [0.02, 0.12], [0, 1]);
-  const attributionOpacity = useTransform(scrollYProgress, [0.82, 0.96], [0, 1]);
+  /* Eyebrow: fades in during first 8% of scroll */
+  const eyebrowOpacity = useTransform(scrollYProgress, [0, 0.08], [0, 1]);
+  /* Attribution: fades in during last 15% */
+  const attrOpacity    = useTransform(scrollYProgress, [0.85, 1], [0, 1]);
+
+  const words = QUOTE.split(" ");
 
   return (
     <section
       ref={containerRef}
-      /* 300vh gives generous scroll room; sticky inner pins to viewport */
       className="relative"
       style={{ height: "300vh" }}
     >
+      {/* Sticky viewport-height panel */}
       <div
         className="sticky top-0 flex flex-col justify-center px-5 sm:px-8"
         style={{ height: "100dvh" }}
@@ -90,36 +97,33 @@ export function Quote() {
             The bet
           </motion.span>
 
-          {/* Word-by-word scroll reveal */}
+          {/* Word-by-word blur+opacity reveal */}
           <p
-            className="flex flex-wrap text-[28px] sm:text-[44px] lg:text-[60px] leading-[1.1] tracking-[-0.028em] font-normal"
+            className="flex flex-wrap text-[28px] sm:text-[44px] lg:text-[60px] leading-[1.12] tracking-[-0.028em] font-normal"
             style={{ fontFamily: "'ClashDisplay-Variable', sans-serif" }}
           >
             <span
-              className="inline-block mr-[0.1em]"
-              style={{ color: "hsl(249 60% 42%)" }}
               aria-hidden
+              className="inline-block mr-[0.08em]"
+              style={{ color: "hsl(249 55% 48%)" }}
             >
               "
             </span>
 
-            {WORDS.map((word, i) => {
-              const start = i / WORDS.length;
-              const end   = start + 1 / WORDS.length;
+            {words.map((word, i) => {
+              const start = i / words.length;
+              const end   = start + 1 / words.length;
               return (
-                <Word
-                  key={i}
-                  word={word}
-                  progress={scrollYProgress}
-                  range={[start, end]}
-                />
+                <Word key={i} progress={scrollYProgress} range={[start, end]}>
+                  {word}
+                </Word>
               );
             })}
 
             <span
-              className="inline-block ml-[0.1em]"
-              style={{ color: "hsl(249 60% 42%)" }}
               aria-hidden
+              className="inline-block ml-[0.04em]"
+              style={{ color: "hsl(249 55% 48%)" }}
             >
               "
             </span>
@@ -128,7 +132,7 @@ export function Quote() {
           {/* Attribution */}
           <motion.div
             className="mt-10 flex items-center gap-3"
-            style={{ opacity: attributionOpacity }}
+            style={{ opacity: attrOpacity }}
           >
             <span
               className="h-px w-12"
@@ -144,6 +148,7 @@ export function Quote() {
               Bahrawy · design principle № 1
             </span>
           </motion.div>
+
         </div>
       </div>
     </section>
