@@ -23,7 +23,9 @@ import { LandingNav } from "./LandingNav";
 import { Hero } from "./sections/Hero";
 import { Marquee } from "./sections/Marquee";
 import { Manifesto } from "./sections/Manifesto";
+import { Stats } from "./sections/Stats";
 import { Features } from "./sections/Features";
+import { KeyboardSection } from "./sections/KeyboardSection";
 import { Quote } from "./sections/Quote";
 import { About } from "./sections/About";
 import { FinalCta } from "./sections/FinalCta";
@@ -68,7 +70,9 @@ export function Landing() {
           <Hero />
           <Marquee />
           <Manifesto />
+          <Stats />
           <Features />
+          <KeyboardSection />
           <Quote />
           <About />
           <FinalCta />
