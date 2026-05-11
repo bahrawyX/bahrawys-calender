@@ -101,7 +101,7 @@ const EventContent = React.memo<{
             provider === 'google'
               ? <GoogleProviderIcon size={isShort ? 10 : 12} className="flex-shrink-0" />
               : provider === 'apple'
-                ? <AppleProviderIcon size={isShort ? 14 : 16} className="flex-shrink-0 text-[#1d1d1f] dark:text-[#C0C0C0]" />
+                ? <AppleProviderIcon size={isShort ? 10 : 12} className="flex-shrink-0 text-[#1d1d1f] dark:text-[#C0C0C0]" />
                 : <OutlookProviderIcon size={isShort ? 10 : 12} className="flex-shrink-0 opacity-80" />
           )}
           {(forceInitialsMode || useCompactTitle) ? (
