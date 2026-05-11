@@ -15,7 +15,7 @@ import { Reveal } from "../Reveal";
 export function Manifesto() {
   return (
     <section className="relative py-28 sm:py-36 lg:py-44 px-5 sm:px-8">
-      <div className="mx-auto max-w-7xl grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-14 lg:gap-24">
+      <div className="mx-auto max-w-7xl grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-14 lg:gap-24 items-start">
         <div className="lg:sticky lg:top-32">
           <Reveal>
             <span
