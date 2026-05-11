@@ -11,6 +11,7 @@
  * surface, blur on text would be visually clipped during render).
  */
 
+import Image from "next/image";
 import Link from "next/link";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useRef, useEffect } from "react";
@@ -251,111 +252,16 @@ function CalendarMock() {
             border: "1px solid hsl(0 0% 100% / 0.08)",
           }}
         >
-          {/* Inner core */}
-          <div
-            className="rounded-[calc(2rem-0.375rem)] overflow-hidden"
-            style={{
-              background: "linear-gradient(180deg, hsl(240 7% 10%), hsl(240 6% 7%))",
-              boxShadow: "0 1px 0 hsl(0 0% 100% / 0.06) inset",
-            }}
-          >
-            {/* Top toolbar */}
-            <div
-              className="flex items-center justify-between px-5 py-3.5"
-              style={{ borderBottom: "1px solid hsl(0 0% 100% / 0.05)" }}
-            >
-              <div className="flex items-center gap-2">
-                <span className="h-2.5 w-2.5 rounded-full" style={{ background: "hsl(0 65% 60%)" }} />
-                <span className="h-2.5 w-2.5 rounded-full" style={{ background: "hsl(45 80% 60%)" }} />
-                <span className="h-2.5 w-2.5 rounded-full" style={{ background: "hsl(140 50% 55%)" }} />
-              </div>
-              <div
-                className="text-[11px] font-medium tracking-[0.16em] uppercase"
-                style={{
-                  fontFamily: "var(--font-geist-mono), monospace",
-                  color: "hsl(36 12% 64%)",
-                }}
-              >
-                May 2026
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  className="rounded-md px-2 py-1 text-[11px] font-medium"
-                  style={{ background: "hsl(0 0% 100% / 0.05)", color: "hsl(36 16% 82%)" }}
-                >
-                  Month
-                </button>
-                <button
-                  className="rounded-md px-2 py-1 text-[11px] font-medium"
-                  style={{ color: "hsl(36 12% 60%)" }}
-                >
-                  Week
-                </button>
-              </div>
-            </div>
-
-            {/* Weekday header */}
-            <div className="grid grid-cols-7 gap-px px-1 pt-1">
-              {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => (
-                <div
-                  key={d}
-                  className="text-[10px] uppercase tracking-[0.14em] text-center py-2"
-                  style={{
-                    fontFamily: "var(--font-geist-mono), monospace",
-                    color: "hsl(36 10% 56%)",
-                  }}
-                >
-                  {d}
-                </div>
-              ))}
-            </div>
-
-            {/* Calendar grid — 5 rows × 7 cols of stylized cells */}
-            <div className="grid grid-cols-7 gap-1 p-1.5">
-              {Array.from({ length: 35 }).map((_, i) => {
-                const day = i - 3; // start offset
-                const isToday = day === 10;
-                const events = MOCK_EVENTS.filter((e) => e.day === day);
-                return (
-                  <div
-                    key={i}
-                    className="rounded-lg p-1.5 min-h-[64px] sm:min-h-[78px] lg:min-h-[92px] flex flex-col gap-1"
-                    style={{
-                      background: isToday ? "hsl(249 70% 50% / 0.1)" : "hsl(0 0% 100% / 0.015)",
-                      border: isToday
-                        ? "1px solid hsl(249 70% 65% / 0.4)"
-                        : "1px solid hsl(0 0% 100% / 0.04)",
-                    }}
-                  >
-                    <span
-                      className="text-[10px] font-medium leading-none"
-                      style={{
-                        color: day > 0 && day <= 31
-                          ? isToday
-                            ? "hsl(249 80% 80%)"
-                            : "hsl(36 16% 80%)"
-                          : "hsl(36 8% 38%)",
-                      }}
-                    >
-                      {day > 0 && day <= 31 ? day : ""}
-                    </span>
-                    {events.map((ev, j) => (
-                      <div
-                        key={j}
-                        className="rounded-[5px] px-1.5 py-1 text-[9px] sm:text-[10px] font-medium leading-tight truncate"
-                        style={{
-                          background: `linear-gradient(135deg, ${ev.color}26, ${ev.color}10)`,
-                          color: ev.color,
-                          border: `1px solid ${ev.color}30`,
-                        }}
-                      >
-                        {ev.title}
-                      </div>
-                    ))}
-                  </div>
-                );
-              })}
-            </div>
+          {/* Inner core — real calendar screenshot */}
+          <div className="rounded-[calc(2rem-0.375rem)] overflow-hidden">
+            <Image
+              src="/calendar-screenshot.jpg"
+              alt="Bahrawy Calendar — month view"
+              width={1400}
+              height={820}
+              className="w-full h-auto block"
+              priority
+            />
           </div>
         </div>
 
@@ -407,19 +313,3 @@ function ProviderBubble({ label, hue }: { label: string; hue: number }) {
   );
 }
 
-const MOCK_EVENTS = [
-  { day: 1, title: "Standup", color: "#6D59E0" },
-  { day: 3, title: "Design crit", color: "#EC4899" },
-  { day: 4, title: "1:1 Sam", color: "#10B981" },
-  { day: 6, title: "Deep work", color: "#6D59E0" },
-  { day: 8, title: "Ship v1.2", color: "#F59E0B" },
-  { day: 10, title: "Demo · Bahrawy", color: "#6D59E0" },
-  { day: 10, title: "Lunch", color: "#10B981" },
-  { day: 12, title: "Workshop", color: "#EC4899" },
-  { day: 14, title: "Review", color: "#475569" },
-  { day: 17, title: "Travel", color: "#F59E0B" },
-  { day: 19, title: "Planning", color: "#6D59E0" },
-  { day: 22, title: "Offsite", color: "#EC4899" },
-  { day: 24, title: "Focus", color: "#6D59E0" },
-  { day: 27, title: "Retro", color: "#10B981" },
-] as const;
