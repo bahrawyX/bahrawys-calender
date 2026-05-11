@@ -18,6 +18,7 @@
  *   - Mono / labels: Geist Mono
  */
 
+import { ReactLenis } from "lenis/react";
 import { LandingNav } from "./LandingNav";
 import { Hero } from "./sections/Hero";
 import { Marquee } from "./sections/Marquee";
@@ -28,37 +29,54 @@ import { About } from "./sections/About";
 import { FinalCta } from "./sections/FinalCta";
 import { LandingFooter } from "./LandingFooter";
 
+/** Lenis easing — expo-out feel, matches the site's ease-out-quart motion */
+const lenisEasing = (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t));
+
 export function Landing() {
   return (
-    <div
-      className="relative min-h-[100dvh] w-full overflow-x-clip text-foreground antialiased"
-      style={{
-        // Restrained dark color strategy — tinted toward the brand purple
-        // instead of pure neutral. Closer to OLED than pure black.
-        background: "hsl(248 14% 5%)",
-        fontFamily: "var(--font-geist-sans), -apple-system, BlinkMacSystemFont, sans-serif",
-        letterSpacing: "-0.011em",
+    <ReactLenis
+      root
+      options={{
+        duration: 1.15,
+        easing: lenisEasing,
+        orientation: "vertical",
+        gestureOrientation: "vertical",
+        smoothWheel: true,
+        wheelMultiplier: 0.9,
+        touchMultiplier: 1.8,
+        infinite: false,
       }}
     >
-      {/* Ambient glow — fixed layer, pointer-events none, drifts behind content.
-          Two tinted blobs (purple, soft cyan-violet) provide depth without
-          triggering layout/paint on scroll. */}
-      <AmbientGlow />
+      <div
+        className="relative min-h-[100dvh] w-full overflow-x-clip text-foreground antialiased"
+        style={{
+          // Restrained dark color strategy — tinted toward the brand purple
+          // instead of pure neutral. Closer to OLED than pure black.
+          background: "hsl(248 14% 5%)",
+          fontFamily: "var(--font-geist-sans), -apple-system, BlinkMacSystemFont, sans-serif",
+          letterSpacing: "-0.011em",
+        }}
+      >
+        {/* Ambient glow — fixed layer, pointer-events none, drifts behind content.
+            Two tinted blobs (purple, soft cyan-violet) provide depth without
+            triggering layout/paint on scroll. */}
+        <AmbientGlow />
 
-      <LandingNav />
+        <LandingNav />
 
-      <main className="relative z-10">
-        <Hero />
-        <Marquee />
-        <Manifesto />
-        <Features />
-        <Quote />
-        <About />
-        <FinalCta />
-      </main>
+        <main className="relative z-10">
+          <Hero />
+          <Marquee />
+          <Manifesto />
+          <Features />
+          <Quote />
+          <About />
+          <FinalCta />
+        </main>
 
-      <LandingFooter />
-    </div>
+        <LandingFooter />
+      </div>
+    </ReactLenis>
   );
 }
 
