@@ -19,6 +19,7 @@
  */
 
 import { ReactLenis } from "lenis/react";
+import { ScrollProgressBar } from "./ScrollProgressBar";
 import { LandingNav } from "./LandingNav";
 import { Hero } from "./sections/Hero";
 import { Marquee } from "./sections/Marquee";
@@ -63,6 +64,7 @@ export function Landing() {
             Two tinted blobs (purple, soft cyan-violet) provide depth without
             triggering layout/paint on scroll. */}
         <AmbientGlow />
+        <ScrollProgressBar />
 
         <LandingNav />
 
