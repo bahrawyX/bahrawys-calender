@@ -518,6 +518,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
 
+  // Landing page renders bare — no sidebar, no app chrome, no mobile bottom nav.
+  // The marketing surface owns its full layout.
+  if (pathname === "/") {
+    return <>{children}</>;
+  }
+
   // Calendar store
   const openModal = useCalendarStore((s) => s.openModal);
   const isSidebarCollapsed = useCalendarStore((s) => s.isSidebarCollapsed);

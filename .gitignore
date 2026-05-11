@@ -10,3 +10,9 @@ dist
 next-env.d.ts
 
 .vercel
+
+# Local AI agent / skill tooling
+.agents
+.claude
+skills-lock.json
+tsconfig.tsbuildinfo
