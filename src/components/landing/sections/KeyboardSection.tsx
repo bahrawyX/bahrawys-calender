@@ -49,11 +49,10 @@ function Key({ label }: { label: string }) {
       className="inline-grid place-items-center rounded-[7px] min-w-[2rem] h-8 px-2 text-[12px] font-medium select-none transition-all duration-100 active:scale-95"
       style={{
         fontFamily: "var(--font-geist-mono), monospace",
-        color: "hsl(36 20% 92%)",
-        background: "linear-gradient(180deg, hsl(240 8% 13%), hsl(240 7% 10%))",
-        border: "1px solid hsl(0 0% 100% / 0.1)",
-        boxShadow:
-          "0 1px 0 hsl(0 0% 100% / 0.12) inset, 0 2px 0 hsl(0 0% 0% / 0.4)",
+        color: "var(--lp-kbd-text)",
+        background: "var(--lp-kbd-bg)",
+        border: "1px solid var(--lp-kbd-border)",
+        boxShadow: "var(--lp-kbd-shadow)",
       }}
     >
       {label}
@@ -74,7 +73,7 @@ export function KeyboardSection() {
               className="text-[10px] uppercase tracking-[0.22em] font-medium"
               style={{
                 fontFamily: "var(--font-geist-mono), monospace",
-                color: "hsl(249 60% 72%)",
+                color: "var(--lp-purple)",
               }}
             >
               Keyboard-first
@@ -86,11 +85,11 @@ export function KeyboardSection() {
               className="mt-5 text-[36px] sm:text-[48px] lg:text-[58px] leading-[1.02] tracking-[-0.032em] font-medium"
               style={{
                 fontFamily: "'ClashDisplay-Variable', sans-serif",
-                color: "hsl(36 24% 95%)",
+                color: "var(--lp-h)",
               }}
             >
               Your hands{" "}
-              <span style={{ color: "hsl(36 14% 60%)" }}>
+              <span style={{ color: "var(--lp-h-soft)" }}>
                 never leave the keys.
               </span>
             </h2>
@@ -99,7 +98,7 @@ export function KeyboardSection() {
           <Reveal delay={0.1}>
             <p
               className="mt-6 max-w-[42ch] text-base sm:text-[17px] leading-[1.62]"
-              style={{ color: "hsl(36 12% 68%)" }}
+              style={{ color: "var(--lp-body)" }}
             >
               Every action that matters has a key. Navigate weeks, create
               events, switch views, toggle contexts — all without reaching for
@@ -116,17 +115,15 @@ export function KeyboardSection() {
               <div
                 className="relative rounded-[1.5rem] p-1.5"
                 style={{
-                  background:
-                    "linear-gradient(180deg, hsl(0 0% 100% / 0.055), hsl(0 0% 100% / 0.015))",
-                  border: "1px solid hsl(0 0% 100% / 0.07)",
+                  background: "var(--lp-bezel-grad)",
+                  border: "1px solid var(--lp-border)",
                 }}
               >
                 <div
                   className="rounded-[calc(1.5rem-0.375rem)] px-6 sm:px-8 py-6"
                   style={{
-                    background:
-                      "linear-gradient(180deg, hsl(240 7% 10%), hsl(240 6% 7%))",
-                    boxShadow: "0 1px 0 hsl(0 0% 100% / 0.06) inset",
+                    background: "var(--lp-kbd-card-bg)",
+                    boxShadow: "var(--lp-kbd-card-shadow)",
                   }}
                 >
                   {/* Group label */}
@@ -134,7 +131,7 @@ export function KeyboardSection() {
                     className="text-[10px] uppercase tracking-[0.22em] font-medium"
                     style={{
                       fontFamily: "var(--font-geist-mono), monospace",
-                      color: "hsl(36 10% 50%)",
+                      color: "var(--lp-label)",
                     }}
                   >
                     {group.label}
@@ -148,7 +145,7 @@ export function KeyboardSection() {
                         className="flex items-center justify-between gap-4"
                         style={{
                           paddingTop: si > 0 ? "0.75rem" : 0,
-                          borderTop: si > 0 ? "1px solid hsl(0 0% 100% / 0.05)" : "none",
+                          borderTop: si > 0 ? "1px solid var(--lp-border-faint)" : "none",
                         }}
                       >
                         {/* Keys */}
@@ -161,7 +158,7 @@ export function KeyboardSection() {
                         {/* Description */}
                         <span
                           className="text-[13px] font-medium text-right"
-                          style={{ color: "hsl(36 14% 72%)" }}
+                          style={{ color: "var(--lp-body)" }}
                         >
                           {s.desc}
                         </span>

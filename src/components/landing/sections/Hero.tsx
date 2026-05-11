@@ -48,7 +48,7 @@ export function Hero() {
             className="text-[10px] uppercase tracking-[0.22em] font-medium"
             style={{
               fontFamily: "var(--font-geist-mono), monospace",
-              color: "hsl(36 14% 78%)",
+              color: "var(--lp-label)",
             }}
           >
             Bahrawy · v1 · live
@@ -60,12 +60,12 @@ export function Hero() {
           className="mt-7 sm:mt-9 text-[44px] xs:text-[52px] sm:text-[78px] lg:text-[112px] xl:text-[124px] leading-[0.92] tracking-[-0.038em] font-medium max-w-[14ch]"
           style={{
             fontFamily: "'ClashDisplay-Variable', sans-serif",
-            color: "hsl(36 24% 96%)",
+            color: "var(--lp-h)",
           }}
         >
           <WordReveal words={["A", "calendar", "that"]} baseDelay={0.25} />
           <br />
-          <span style={{ color: "hsl(36 14% 70%)" }}>
+          <span style={{ color: "var(--lp-h-soft)" }}>
             <WordReveal words={["gets", "out", "of", "your", "way."]} baseDelay={0.5} />
           </span>
         </h1>
@@ -76,7 +76,7 @@ export function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: EASE_OUT_QUART, delay: 0.95 }}
           className="mt-8 sm:mt-10 max-w-[58ch] text-base sm:text-[17px] leading-[1.55]"
-          style={{ color: "hsl(36 12% 70%)" }}
+          style={{ color: "var(--lp-body)" }}
         >
           Drag to reschedule. Recurrence that bends to real life. Google,
           Outlook, and Apple in a single grid. No signup, no servers, no
@@ -105,7 +105,7 @@ export function Hero() {
         aria-hidden
         className="pointer-events-none absolute inset-x-0 bottom-0 h-24"
         style={{
-          background: "linear-gradient(to bottom, transparent, hsl(240 8% 8%))",
+          background: "linear-gradient(to bottom, transparent, var(--lp-bg))",
         }}
       />
     </section>
@@ -180,9 +180,9 @@ function SecondaryCta({ href, children, external }: { href: string; children: st
       {...props}
       className="group inline-flex items-center gap-2 rounded-full px-5 py-3 text-[15px] font-medium transition-all duration-200 active:scale-[0.97]"
       style={{
-        color: "hsl(36 18% 88%)",
-        border: "1px solid hsl(0 0% 100% / 0.1)",
-        background: "hsl(0 0% 100% / 0.03)",
+        color: "var(--lp-h-soft)",
+        border: "1px solid var(--lp-border-strong)",
+        background: "var(--lp-ghost-bg)",
       }}
     >
       <span>{children}</span>
@@ -252,10 +252,10 @@ function CalendarMock() {
         <div
           className="relative rounded-[2rem] p-1.5"
           style={{
-            background: "linear-gradient(180deg, hsl(0 0% 100% / 0.06), hsl(0 0% 100% / 0.02))",
+            background: "var(--lp-bezel-grad)",
             boxShadow:
-              "0 1px 0 hsl(0 0% 100% / 0.08) inset, 0 60px 120px -40px hsl(249 66% 26% / 0.28), 0 30px 60px -20px hsl(0 0% 0% / 0.5)",
-            border: "1px solid hsl(0 0% 100% / 0.08)",
+              "0 60px 120px -40px hsl(249 66% 26% / 0.28), 0 30px 60px -20px hsl(0 0% 0% / 0.5)",
+            border: "1px solid var(--lp-border-strong)",
           }}
         >
           {/* Inner core — real calendar screenshot */}

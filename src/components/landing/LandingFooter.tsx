@@ -11,7 +11,7 @@ export function LandingFooter() {
   return (
     <footer
       className="relative z-10 border-t mt-12 px-5 sm:px-8"
-      style={{ borderColor: "hsl(0 0% 100% / 0.06)" }}
+      style={{ borderColor: "var(--lp-border-faint)" }}
     >
       <div className="mx-auto max-w-7xl py-10 sm:py-12 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8">
         <div className="flex items-center gap-3">
@@ -21,7 +21,7 @@ export function LandingFooter() {
               className="text-[15px] font-medium tracking-[-0.018em]"
               style={{
                 fontFamily: "'ClashDisplay-Variable', sans-serif",
-                color: "hsl(36 22% 92%)",
+                color: "var(--lp-h)",
               }}
             >
               Bahrawy
@@ -30,7 +30,7 @@ export function LandingFooter() {
               className="text-[11px] tracking-[0.04em]"
               style={{
                 fontFamily: "var(--font-geist-mono), monospace",
-                color: "hsl(36 10% 54%)",
+                color: "var(--lp-dim)",
               }}
             >
               v1 · live · 2026
@@ -42,7 +42,7 @@ export function LandingFooter() {
           <Link
             href="/calendar"
             className="transition-colors"
-            style={{ color: "hsl(36 14% 76%)" }}
+            style={{ color: "var(--lp-label)" }}
           >
             Calendar
           </Link>
@@ -51,7 +51,7 @@ export function LandingFooter() {
             target="_blank"
             rel="noopener noreferrer"
             className="transition-colors flex items-center gap-1.5"
-            style={{ color: "hsl(36 14% 76%)" }}
+            style={{ color: "var(--lp-label)" }}
           >
             bahrawy.me
             <svg width={11} height={11} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round">
@@ -64,7 +64,7 @@ export function LandingFooter() {
             target="_blank"
             rel="noopener noreferrer"
             className="transition-colors flex items-center gap-1.5"
-            style={{ color: "hsl(36 14% 76%)" }}
+            style={{ color: "var(--lp-label)" }}
           >
             bahrawys-calender.vercel.app
             <svg width={11} height={11} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round">

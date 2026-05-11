@@ -23,20 +23,20 @@ export function Marquee() {
     <section
       className="relative py-12 sm:py-16 border-y overflow-hidden"
       style={{
-        borderColor: "hsl(0 0% 100% / 0.05)",
-        background: "linear-gradient(180deg, hsl(248 14% 5% / 0), hsl(248 14% 4% / 0.6), hsl(248 14% 5% / 0))",
+        borderColor: "var(--lp-border-faint)",
+        background: "var(--lp-marquee-bg)",
       }}
     >
       {/* Edge fades so the marquee doesn't end abruptly */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 sm:w-40"
-        style={{ background: "linear-gradient(to right, hsl(248 14% 5%), transparent)" }}
+        style={{ background: "linear-gradient(to right, var(--lp-marquee-fade), transparent)" }}
       />
       <div
         aria-hidden
         className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 sm:w-40"
-        style={{ background: "linear-gradient(to left, hsl(248 14% 5%), transparent)" }}
+        style={{ background: "linear-gradient(to left, var(--lp-marquee-fade), transparent)" }}
       />
 
       <div className="flex whitespace-nowrap [animation:marquee_38s_linear_infinite]">
@@ -61,13 +61,13 @@ function Track({ items, ...rest }: { items: string[] } & React.HTMLAttributes<HT
         <div key={`${item}-${i}`} className="flex items-center gap-4 shrink-0">
           <span
             className="h-1.5 w-1.5 rounded-full"
-            style={{ background: "hsl(249 70% 65%)" }}
+            style={{ background: "var(--lp-purple)" }}
           />
           <span
             className="text-base sm:text-xl font-medium tracking-[-0.01em]"
             style={{
               fontFamily: "'ClashDisplay-Variable', sans-serif",
-              color: "hsl(36 14% 72%)",
+              color: "var(--lp-body)",
             }}
           >
             {item}

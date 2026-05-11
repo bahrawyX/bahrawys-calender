@@ -53,9 +53,7 @@ export function Landing() {
       <div
         className="relative min-h-[100dvh] w-full overflow-x-clip text-foreground antialiased"
         style={{
-          // Restrained dark color strategy — tinted toward the brand purple
-          // instead of pure neutral. Closer to OLED than pure black.
-          background: "hsl(240 8% 8%)",
+          background: "var(--lp-bg)",
           fontFamily: "var(--font-geist-sans), -apple-system, BlinkMacSystemFont, sans-serif",
           letterSpacing: "-0.011em",
         }}

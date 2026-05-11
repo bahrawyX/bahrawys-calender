@@ -47,7 +47,7 @@ export function FinalCta() {
                 className="relative text-[40px] sm:text-[60px] lg:text-[80px] leading-[0.98] tracking-[-0.034em] font-medium max-w-[16ch] mx-auto"
                 style={{
                   fontFamily: "'ClashDisplay-Variable', sans-serif",
-                  color: "hsl(36 28% 97%)",
+                  color: "hsl(36 28% 97%)", /* stays light — FinalCta is always a dark card */
                 }}
               >
                 Open Bahrawy.{" "}

@@ -44,7 +44,7 @@ const Word: FC<WordProps> = ({ children, progress, range }) => {
         opacity,
         filter,
         marginRight: "0.22em",
-        color: "hsl(36 28% 97%)",
+        color: "var(--lp-h)",
         willChange: "opacity, filter",
       }}
     >
@@ -96,7 +96,7 @@ export function Quote() {
             className="block text-[10px] uppercase tracking-[0.22em] font-medium mb-8"
             style={{
               fontFamily: "var(--font-geist-mono), monospace",
-              color: "hsl(249 60% 72%)",
+              color: "var(--lp-purple)",
               opacity: eyebrowOpacity,
             }}
           >
@@ -111,7 +111,7 @@ export function Quote() {
             <span
               aria-hidden
               className="inline-block mr-[0.08em]"
-              style={{ color: "hsl(249 55% 48%)" }}
+              style={{ color: "var(--lp-purple-muted)" }}
             >
               "
             </span>
@@ -129,7 +129,7 @@ export function Quote() {
             <span
               aria-hidden
               className="inline-block ml-[0.04em]"
-              style={{ color: "hsl(249 55% 48%)" }}
+              style={{ color: "var(--lp-purple-muted)" }}
             >
               "
             </span>
@@ -142,13 +142,13 @@ export function Quote() {
           >
             <span
               className="h-px w-12"
-              style={{ background: "hsl(0 0% 100% / 0.18)" }}
+              style={{ background: "var(--lp-rule)" }}
             />
             <span
               className="text-[12px] font-medium tracking-[0.04em]"
               style={{
                 fontFamily: "var(--font-geist-mono), monospace",
-                color: "hsl(36 12% 64%)",
+                color: "var(--lp-label)",
               }}
             >
               Bahrawy · design principle № 1

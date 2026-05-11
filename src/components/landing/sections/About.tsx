@@ -22,8 +22,8 @@ export function About() {
             <div
               className="relative rounded-[1.5rem] p-1.5 w-44 sm:w-56"
               style={{
-                background: "linear-gradient(180deg, hsl(0 0% 100% / 0.08), hsl(0 0% 100% / 0.02))",
-                border: "1px solid hsl(0 0% 100% / 0.08)",
+                background: "var(--lp-bezel-grad)",
+                border: "1px solid var(--lp-border-strong)",
                 boxShadow: "0 30px 80px -28px hsl(249 66% 26% / 0.28)",
               }}
             >
@@ -64,7 +64,7 @@ export function About() {
                 className="text-[10px] uppercase tracking-[0.22em] font-medium"
                 style={{
                   fontFamily: "var(--font-geist-mono), monospace",
-                  color: "hsl(249 60% 72%)",
+                  color: "var(--lp-purple)",
                 }}
               >
                 The maker
@@ -76,7 +76,7 @@ export function About() {
                 className="mt-5 text-[36px] sm:text-[48px] lg:text-[58px] leading-[1.02] tracking-[-0.032em] font-medium max-w-[18ch]"
                 style={{
                   fontFamily: "'ClashDisplay-Variable', sans-serif",
-                  color: "hsl(36 24% 95%)",
+                  color: "var(--lp-h)",
                 }}
               >
                 Built by{" "}
@@ -101,7 +101,7 @@ export function About() {
             <Reveal delay={0.1}>
               <p
                 className="mt-7 max-w-[54ch] text-base sm:text-[17px] leading-[1.62]"
-                style={{ color: "hsl(36 12% 70%)" }}
+                style={{ color: "var(--lp-body)" }}
               >
                 I&apos;m a software engineer who keeps ending up building the
                 tools I wish existed. This is one of those: a calendar I could
@@ -118,9 +118,9 @@ export function About() {
                 rel="noopener noreferrer"
                 className="mt-9 group inline-flex items-center gap-2 rounded-full pl-5 pr-2 py-2 text-[15px] font-medium transition-transform duration-200 active:scale-[0.97]"
                 style={{
-                  background: "hsl(0 0% 100% / 0.05)",
-                  border: "1px solid hsl(0 0% 100% / 0.1)",
-                  color: "hsl(36 18% 90%)",
+                  background: "var(--lp-ghost-bg)",
+                  border: "1px solid var(--lp-border-strong)",
+                  color: "var(--lp-h-soft)",
                 }}
               >
                 <span>Visit bahrawy.me</span>

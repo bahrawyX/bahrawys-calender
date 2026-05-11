@@ -145,6 +145,97 @@
   --hover-line-bg:      rgba(162,148,240,0.65);
 }
 
+/* ─── Landing page design tokens ─────────────────────────────────────────── */
+/* All landing sections use these instead of hardcoded HSL values, so the
+   full page adapts cleanly when the dark/light class toggles on <html>.    */
+:root {
+  /* Backgrounds */
+  --lp-bg:               hsl(36 18% 97%);
+  --lp-card:             hsl(0 0% 100%);
+  /* Borders (alpha-inclusive full values) */
+  --lp-border:           hsl(0 0% 0% / 0.07);
+  --lp-border-strong:    hsl(0 0% 0% / 0.09);
+  --lp-border-faint:     hsl(0 0% 0% / 0.05);
+  --lp-rule:             hsl(0 0% 0% / 0.15);
+  --lp-divider:          hsl(0 0% 0% / 0.10);
+  /* Outer bezel gradient (Double-Bezel shell) */
+  --lp-bezel-grad:       linear-gradient(180deg, hsl(0 0% 0% / 0.04), hsl(0 0% 0% / 0.01));
+  /* Typography */
+  --lp-h:                hsl(248 28% 10%);
+  --lp-h-soft:           hsl(248 14% 42%);
+  --lp-body:             hsl(248 10% 42%);
+  --lp-label:            hsl(248 8% 52%);
+  --lp-dim:              hsl(248 8% 58%);
+  --lp-subh:             hsl(248 20% 25%);
+  /* Brand accent */
+  --lp-purple:           hsl(249 66% 52%);
+  --lp-purple-muted:     hsl(249 60% 50%);
+  /* Nav */
+  --lp-nav-bg:           hsl(36 16% 96% / 0.55);
+  --lp-nav-bg-scrolled:  hsl(36 16% 97% / 0.88);
+  --lp-nav-border:       hsl(0 0% 0% / 0.08);
+  --lp-nav-overlay:      hsl(36 16% 96% / 0.96);
+  /* Keyboard keys */
+  --lp-kbd-bg:           linear-gradient(180deg, hsl(248 10% 88%), hsl(248 8% 82%));
+  --lp-kbd-text:         hsl(248 20% 20%);
+  --lp-kbd-border:       hsl(0 0% 0% / 0.12);
+  --lp-kbd-shadow:       0 1px 0 hsl(0 0% 100% / 0.80) inset, 0 2px 0 hsl(0 0% 0% / 0.10);
+  /* Keyboard card surface */
+  --lp-kbd-card-bg:      linear-gradient(180deg, hsl(248 12% 94%), hsl(248 10% 92%));
+  --lp-kbd-card-shadow:  0 1px 0 hsl(0 0% 0% / 0.03) inset;
+  /* Stats card */
+  --lp-stat-card-bg:     radial-gradient(120% 200% at 50% 0%, hsl(249 25% 93%), hsl(36 12% 99%) 55%);
+  /* Marquee */
+  --lp-marquee-fade:     hsl(36 12% 97%);
+  --lp-marquee-bg:       transparent;
+  /* Ghost button */
+  --lp-ghost-bg:         hsl(0 0% 0% / 0.03);
+}
+
+.dark {
+  /* Backgrounds */
+  --lp-bg:               hsl(240 8% 8%);
+  --lp-card:             hsl(240 7% 10%);
+  /* Borders */
+  --lp-border:           hsl(0 0% 100% / 0.07);
+  --lp-border-strong:    hsl(0 0% 100% / 0.08);
+  --lp-border-faint:     hsl(0 0% 100% / 0.05);
+  --lp-rule:             hsl(0 0% 100% / 0.18);
+  --lp-divider:          hsl(0 0% 100% / 0.10);
+  /* Outer bezel gradient */
+  --lp-bezel-grad:       linear-gradient(180deg, hsl(0 0% 100% / 0.055), hsl(0 0% 100% / 0.015));
+  /* Typography */
+  --lp-h:                hsl(36 24% 95%);
+  --lp-h-soft:           hsl(36 14% 60%);
+  --lp-body:             hsl(36 12% 68%);
+  --lp-label:            hsl(36 10% 50%);
+  --lp-dim:              hsl(36 8% 42%);
+  --lp-subh:             hsl(36 20% 88%);
+  /* Brand accent */
+  --lp-purple:           hsl(249 60% 72%);
+  --lp-purple-muted:     hsl(249 55% 48%);
+  /* Nav */
+  --lp-nav-bg:           hsl(240 7% 9% / 0.45);
+  --lp-nav-bg-scrolled:  hsl(240 7% 8% / 0.78);
+  --lp-nav-border:       hsl(0 0% 100% / 0.08);
+  --lp-nav-overlay:      hsl(240 8% 7% / 0.94);
+  /* Keyboard keys */
+  --lp-kbd-bg:           linear-gradient(180deg, hsl(240 8% 13%), hsl(240 7% 10%));
+  --lp-kbd-text:         hsl(36 20% 92%);
+  --lp-kbd-border:       hsl(0 0% 100% / 0.10);
+  --lp-kbd-shadow:       0 1px 0 hsl(0 0% 100% / 0.12) inset, 0 2px 0 hsl(0 0% 0% / 0.40);
+  /* Keyboard card surface */
+  --lp-kbd-card-bg:      linear-gradient(180deg, hsl(240 7% 10%), hsl(240 6% 7%));
+  --lp-kbd-card-shadow:  0 1px 0 hsl(0 0% 100% / 0.06) inset;
+  /* Stats card */
+  --lp-stat-card-bg:     radial-gradient(120% 200% at 50% 0%, hsl(249 25% 11% / 0.50), hsl(240 7% 8%) 55%);
+  /* Marquee */
+  --lp-marquee-fade:     hsl(248 14% 5%);
+  --lp-marquee-bg:       linear-gradient(180deg, hsl(248 14% 5% / 0), hsl(248 14% 4% / 0.60), hsl(248 14% 5% / 0));
+  /* Ghost button */
+  --lp-ghost-bg:         hsl(0 0% 100% / 0.05);
+}
+
 /* ─── App shell fade-in (avoids hydration mismatch from motion.div) ──────── */
 @keyframes appShellFadeIn {
   from { opacity: 0; }

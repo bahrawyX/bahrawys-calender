@@ -75,9 +75,8 @@ export function Stats() {
           <div
             className="relative rounded-[1.75rem] p-1.5"
             style={{
-              background:
-                "linear-gradient(180deg, hsl(0 0% 100% / 0.06), hsl(0 0% 100% / 0.02))",
-              border: "1px solid hsl(0 0% 100% / 0.07)",
+              background: "var(--lp-bezel-grad)",
+              border: "1px solid var(--lp-border)",
               boxShadow:
                 "0 40px 80px -30px hsl(249 66% 18% / 0.22), 0 1px 0 hsl(0 0% 100% / 0.06) inset",
             }}
@@ -85,8 +84,7 @@ export function Stats() {
             <div
               className="rounded-[calc(1.75rem-0.375rem)] px-8 sm:px-14 py-10 sm:py-12 grid grid-cols-1 sm:grid-cols-3 gap-10 sm:gap-0"
               style={{
-                background:
-                  "radial-gradient(120% 200% at 50% 0%, hsl(249 25% 11% / 0.5), hsl(240 7% 8%) 55%)",
+                background: "var(--lp-stat-card-bg)",
                 boxShadow: "0 1px 0 hsl(0 0% 100% / 0.07) inset",
               }}
             >
@@ -99,7 +97,7 @@ export function Stats() {
                       className="hidden sm:block absolute left-0 top-1/2 -translate-y-1/2 w-px h-16"
                       style={{
                         background:
-                          "linear-gradient(to bottom, transparent, hsl(0 0% 100% / 0.1), transparent)",
+                          "linear-gradient(to bottom, transparent, var(--lp-divider), transparent)",
                       }}
                     />
                   )}
@@ -114,21 +112,21 @@ export function Stats() {
                     {s.prefix && (
                       <span
                         className="text-[36px] sm:text-[44px] font-medium tracking-[-0.03em]"
-                        style={{ color: s.prefixColor }}
+                        style={{ color: "var(--lp-purple)" }}
                       >
                         {s.prefix}
                       </span>
                     )}
                     <span
                       className="text-[56px] sm:text-[72px] font-medium tracking-[-0.04em]"
-                      style={{ color: "hsl(36 28% 97%)" }}
+                      style={{ color: "var(--lp-h)" }}
                     >
                       <CountUp to={s.value} duration={s.value === 0 ? 0.01 : 1.3} />
                     </span>
                     {s.unit && (
                       <span
                         className="text-[24px] sm:text-[32px] font-medium tracking-[-0.02em] ml-0.5"
-                        style={{ color: "hsl(249 60% 70%)" }}
+                        style={{ color: "var(--lp-purple)" }}
                       >
                         {s.unit}
                       </span>
@@ -139,7 +137,7 @@ export function Stats() {
                   <div className="flex flex-col gap-0.5">
                     <span
                       className="text-[13px] sm:text-[14px] font-medium tracking-[0.01em]"
-                      style={{ color: "hsl(36 20% 88%)" }}
+                      style={{ color: "var(--lp-subh)" }}
                     >
                       {s.label}
                     </span>
@@ -147,7 +145,7 @@ export function Stats() {
                       className="text-[11px] tracking-[0.04em] uppercase"
                       style={{
                         fontFamily: "var(--font-geist-mono), monospace",
-                        color: "hsl(36 10% 48%)",
+                        color: "var(--lp-dim)",
                       }}
                     >
                       {s.sublabel}

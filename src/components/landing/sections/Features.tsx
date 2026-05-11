@@ -57,7 +57,7 @@ export function Features() {
             className="text-[10px] uppercase tracking-[0.22em] font-medium"
             style={{
               fontFamily: "var(--font-geist-mono), monospace",
-              color: "hsl(249 60% 70%)",
+              color: "var(--lp-purple)",
             }}
           >
             What you get
@@ -69,11 +69,11 @@ export function Features() {
             className="mt-5 text-[36px] sm:text-[52px] lg:text-[64px] leading-[0.98] tracking-[-0.033em] font-medium max-w-[22ch]"
             style={{
               fontFamily: "'ClashDisplay-Variable', sans-serif",
-              color: "hsl(36 24% 95%)",
+              color: "var(--lp-h)",
             }}
           >
             Six things that{" "}
-            <span style={{ color: "hsl(36 14% 52%)" }}>most calendars get wrong.</span>
+            <span style={{ color: "var(--lp-h-soft)" }}>most calendars get wrong.</span>
           </h2>
         </Reveal>
 
@@ -83,14 +83,14 @@ export function Features() {
             <Reveal key={f.title} delay={0.04 + i * 0.05}>
               <div
                 className="group grid grid-cols-[3rem_1fr] lg:grid-cols-[5rem_1fr_1.1fr] gap-x-6 lg:gap-x-12 items-start py-8 sm:py-10 border-t transition-colors duration-300"
-                style={{ borderColor: "hsl(0 0% 100% / 0.07)" }}
+                style={{ borderColor: "var(--lp-border)" }}
               >
                 {/* Index number */}
                 <span
                   className="text-[13px] font-medium tracking-[0.06em] pt-1 tabular-nums"
                   style={{
                     fontFamily: "var(--font-geist-mono), monospace",
-                    color: "hsl(36 8% 32%)",
+                    color: "var(--lp-dim)",
                   }}
                 >
                   {String(i + 1).padStart(2, "0")}
@@ -102,7 +102,7 @@ export function Features() {
                     className="text-[10px] uppercase tracking-[0.2em] font-medium"
                     style={{
                       fontFamily: "var(--font-geist-mono), monospace",
-                      color: "hsl(36 8% 42%)",
+                      color: "var(--lp-label)",
                     }}
                   >
                     {f.eyebrow}
@@ -111,7 +111,7 @@ export function Features() {
                     className="mt-2 text-[22px] sm:text-[28px] lg:text-[32px] leading-[1.1] tracking-[-0.022em] font-medium"
                     style={{
                       fontFamily: "'ClashDisplay-Variable', sans-serif",
-                      color: "hsl(36 22% 94%)",
+                      color: "var(--lp-h)",
                     }}
                   >
                     {f.title}
@@ -119,7 +119,7 @@ export function Features() {
                   {/* Body visible on mobile under title */}
                   <p
                     className="lg:hidden mt-3 text-[14px] leading-[1.6]"
-                    style={{ color: "hsl(36 10% 60%)" }}
+                    style={{ color: "var(--lp-body)" }}
                   >
                     {f.body}
                   </p>
@@ -128,7 +128,7 @@ export function Features() {
                 {/* Body — desktop right column */}
                 <p
                   className="hidden lg:block text-[15px] sm:text-[16px] leading-[1.65] pt-1"
-                  style={{ color: "hsl(36 10% 60%)" }}
+                  style={{ color: "var(--lp-body)" }}
                 >
                   {f.body}
                 </p>
@@ -139,7 +139,7 @@ export function Features() {
           {/* Bottom border */}
           <div
             className="border-t"
-            style={{ borderColor: "hsl(0 0% 100% / 0.07)" }}
+            style={{ borderColor: "var(--lp-border)" }}
           />
         </div>
 

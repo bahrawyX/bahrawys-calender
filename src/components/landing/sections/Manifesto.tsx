@@ -22,7 +22,7 @@ export function Manifesto() {
               className="inline-block text-[10px] uppercase tracking-[0.22em] font-medium"
               style={{
                 fontFamily: "var(--font-geist-mono), monospace",
-                color: "hsl(249 60% 72%)",
+                color: "var(--lp-purple)",
               }}
             >
               The premise
@@ -34,19 +34,19 @@ export function Manifesto() {
               className="mt-6 text-[40px] sm:text-[56px] lg:text-[72px] leading-[0.96] tracking-[-0.035em] font-medium max-w-[14ch]"
               style={{
                 fontFamily: "'ClashDisplay-Variable', sans-serif",
-                color: "hsl(36 24% 95%)",
+                color: "var(--lp-h)",
               }}
             >
               Most calendars
               <br />
-              <span style={{ color: "hsl(36 14% 60%)" }}>were designed to be opened.</span>
+              <span style={{ color: "var(--lp-h-soft)" }}>were designed to be opened.</span>
             </h2>
           </Reveal>
 
           <Reveal delay={0.1}>
             <p
               className="mt-8 max-w-[44ch] text-base sm:text-[17px] leading-[1.6]"
-              style={{ color: "hsl(36 12% 68%)" }}
+              style={{ color: "var(--lp-body)" }}
             >
               Bahrawy was designed to be closed. The grid loads in under a hundred
               milliseconds, the keyboard is the primary input, and your data
@@ -60,13 +60,13 @@ export function Manifesto() {
             <Reveal key={p.title} delay={0.15 + i * 0.08}>
               <div
                 className="border-t pt-8"
-                style={{ borderColor: "hsl(0 0% 100% / 0.07)" }}
+                style={{ borderColor: "var(--lp-border)" }}
               >
                 <span
                   className="text-[10px] uppercase tracking-[0.22em] font-medium"
                   style={{
                     fontFamily: "var(--font-geist-mono), monospace",
-                    color: "hsl(36 10% 50%)",
+                    color: "var(--lp-label)",
                   }}
                 >
                   {String(i + 1).padStart(2, "0")} · {p.tag}
@@ -75,14 +75,14 @@ export function Manifesto() {
                   className="mt-3 text-2xl sm:text-[28px] leading-[1.15] tracking-[-0.02em] font-medium"
                   style={{
                     fontFamily: "'ClashDisplay-Variable', sans-serif",
-                    color: "hsl(36 22% 94%)",
+                    color: "var(--lp-h)",
                   }}
                 >
                   {p.title}
                 </h3>
                 <p
                   className="mt-3 text-[15px] leading-[1.6]"
-                  style={{ color: "hsl(36 12% 66%)" }}
+                  style={{ color: "var(--lp-body)" }}
                 >
                   {p.body}
                 </p>

@@ -14,6 +14,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTheme } from "@/components/theme-provider";
 import { usePageTransition } from "@/context/TransitionContext";
 
 const EASE_OUT_QUART: [number, number, number, number] = [0.165, 0.84, 0.44, 1];
@@ -22,6 +23,11 @@ export function LandingNav() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const { trigger } = usePageTransition();
+  const { resolvedTheme, setTheme } = useTheme();
+
+  function toggleTheme() {
+    setTheme(resolvedTheme === "dark" ? "light" : "dark");
+  }
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 32);
@@ -55,9 +61,8 @@ export function LandingNav() {
           transition={{ duration: 0.6, ease: EASE_OUT_QUART, delay: 0.1 }}
           className="pointer-events-auto mt-5 sm:mt-7 flex items-center gap-1 rounded-full border px-2 py-1.5 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.35)]"
           style={{
-            // Adaptive opacity: tighter glass when scrolled, lighter at top
-            backgroundColor: scrolled ? "hsl(240 7% 8% / 0.78)" : "hsl(240 7% 9% / 0.45)",
-            borderColor: "hsl(0 0% 100% / 0.08)",
+            backgroundColor: scrolled ? "var(--lp-nav-bg-scrolled)" : "var(--lp-nav-bg)",
+            borderColor: "var(--lp-nav-border)",
             backdropFilter: "blur(16px) saturate(140%)",
             WebkitBackdropFilter: "blur(16px) saturate(140%)",
             transition: "background-color 360ms cubic-bezier(0.165, 0.84, 0.44, 1)",
@@ -73,7 +78,7 @@ export function LandingNav() {
             <BahrawyMark />
             <span
               className="text-[15px] font-medium tracking-[-0.02em]"
-              style={{ fontFamily: "'ClashDisplay-Variable', sans-serif", color: "hsl(36 20% 96%)" }}
+              style={{ fontFamily: "'ClashDisplay-Variable', sans-serif", color: "var(--lp-h)" }}
             >
               Bahrawy
             </span>
@@ -127,11 +132,23 @@ export function LandingNav() {
             </span>
           </button>
 
+          {/* Theme toggle */}
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="grid h-9 w-9 place-items-center rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+            style={{ color: "var(--lp-label)" }}
+            aria-label="Toggle theme"
+          >
+            {resolvedTheme === "dark" ? <SunIcon /> : <MoonIcon />}
+          </button>
+
           {/* Mobile menu trigger */}
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="sm:hidden grid h-9 w-9 place-items-center rounded-full text-[hsl(36_20%_96%)] hover:bg-white/5 transition-colors"
+            className="sm:hidden grid h-9 w-9 place-items-center rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+            style={{ color: "var(--lp-h)" }}
             aria-label="Open menu"
             aria-expanded={open}
           >
@@ -151,12 +168,12 @@ export function LandingNav() {
             border-radius: 9999px;
             font-size: 13px;
             font-weight: 500;
-            color: hsl(36 12% 78%);
+            color: var(--lp-label);
             transition: color 200ms ease-out, background-color 200ms ease-out;
           }
           .navlink:hover {
-            color: hsl(36 20% 96%);
-            background-color: hsl(0 0% 100% / 0.05);
+            color: var(--lp-h);
+            background-color: var(--lp-border-faint);
           }
         `}</style>
       </header>
@@ -171,7 +188,7 @@ export function LandingNav() {
             transition={{ duration: 0.32, ease: EASE_OUT_QUART }}
             className="fixed inset-0 z-[60] flex flex-col px-6 pt-6"
             style={{
-              backgroundColor: "hsl(240 8% 7% / 0.94)",
+              backgroundColor: "var(--lp-nav-overlay)",
               backdropFilter: "blur(28px) saturate(180%)",
               WebkitBackdropFilter: "blur(28px) saturate(180%)",
             }}
@@ -181,7 +198,7 @@ export function LandingNav() {
                 <BahrawyMark />
                 <span
                   className="text-[17px] font-medium tracking-[-0.02em]"
-                  style={{ fontFamily: "'ClashDisplay-Variable', sans-serif", color: "hsl(36 20% 96%)" }}
+                  style={{ fontFamily: "'ClashDisplay-Variable', sans-serif", color: "var(--lp-h)" }}
                 >
                   Bahrawy
                 </span>
@@ -238,8 +255,8 @@ export function LandingNav() {
                 font-size: 2.5rem;
                 font-weight: 400;
                 letter-spacing: -0.03em;
-                color: hsl(36 20% 96%);
-                border-bottom: 1px solid hsl(0 0% 100% / 0.06);
+                color: var(--lp-h);
+                border-bottom: 1px solid var(--lp-border-faint);
               }
               .mobile-link:hover {
                 color: hsl(249 70% 75%);
@@ -278,6 +295,30 @@ function ArrowUpRight({ size = 14 }: { size?: number }) {
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
       <line x1="7" y1="17" x2="17" y2="7" />
       <polyline points="9 7 17 7 17 15" />
+    </svg>
+  );
+}
+
+function SunIcon() {
+  return (
+    <svg width={15} height={15} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="5" />
+      <line x1="12" y1="1" x2="12" y2="3" />
+      <line x1="12" y1="21" x2="12" y2="23" />
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+      <line x1="1" y1="12" x2="3" y2="12" />
+      <line x1="21" y1="12" x2="23" y2="12" />
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+    </svg>
+  );
+}
+
+function MoonIcon() {
+  return (
+    <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
     </svg>
   );
 }
