@@ -97,6 +97,8 @@ const OverflowPopover = memo<{
       <ScrollArea className="h-[300px]">
         <div className="p-2 space-y-0.5">
           {dayEvents.map((ev) => {
+            // Resolve to one of four canonical providers so the badge can pick
+            // the right icon without knowing anything about the app's internals.
             const evProvider: 'google' | 'microsoft' | 'apple' | 'local' =
               ev.provider === 'google' || ev.provider === 'microsoft' || ev.provider === 'apple'
                 ? ev.provider
@@ -112,20 +114,20 @@ const OverflowPopover = memo<{
                 key={ev.id}
                 type="button"
                 onClick={(e) => { e.stopPropagation(); onOpenChange(false); onEventClick(ev.id); }}
-                className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-muted/60 transition-colors duration-100 text-left cursor-pointer"
+                className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-muted/60 transition-colors duration-100 text-left cursor-pointer group"
               >
                 <EventProviderBadge
                   provider={evProvider}
                   category={ev.category}
-                  color={ev.color ?? 'hsl(var(--primary))'}
-                  size={18}
+                  color={ev.color}
+                  size={22}
                 />
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-medium text-foreground truncate leading-tight">
                     {ev.title}
                   </p>
                   {ev.startTime && (
-                    <p className="text-[10px] text-muted-foreground leading-tight mt-0.5">
+                    <p className="text-[10px] text-muted-foreground leading-tight mt-0.5 tabular-nums">
                       {fmtTime(ev.startTime)}
                     </p>
                   )}
