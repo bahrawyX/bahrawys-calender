@@ -14,12 +14,14 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { usePageTransition } from "@/context/TransitionContext";
 
 const EASE_OUT_QUART: [number, number, number, number] = [0.165, 0.84, 0.44, 1];
 
 export function LandingNav() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const { trigger } = usePageTransition();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 32);
@@ -99,8 +101,12 @@ export function LandingNav() {
           </div>
 
           {/* Primary CTA — button-in-button trailing icon */}
-          <Link
-            href="/calendar"
+          <button
+            type="button"
+            onClick={(e) => {
+              const r = e.currentTarget.getBoundingClientRect();
+              trigger("/calendar", { x: r.left + r.width / 2, y: r.top + r.height / 2 });
+            }}
             className="ml-1 group relative inline-flex items-center gap-1.5 rounded-full pl-3.5 pr-1.5 py-1.5 text-[13px] font-medium transition-transform duration-200 active:scale-[0.97]"
             style={{
               background: "linear-gradient(180deg, hsl(36 24% 98%), hsl(36 20% 94%))",
@@ -119,7 +125,7 @@ export function LandingNav() {
             >
               <ArrowUpRight size={12} />
             </span>
-          </Link>
+          </button>
 
           {/* Mobile menu trigger */}
           <button

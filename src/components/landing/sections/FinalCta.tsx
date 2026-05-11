@@ -6,10 +6,11 @@
  * separating itself from the rest of the page.
  */
 
-import Link from "next/link";
 import { Reveal } from "../Reveal";
+import { usePageTransition } from "@/context/TransitionContext";
 
 export function FinalCta() {
+  const { trigger } = usePageTransition();
   return (
     <section className="relative py-20 sm:py-28 px-5 sm:px-8">
       <div className="mx-auto max-w-6xl">
@@ -61,8 +62,12 @@ export function FinalCta() {
               </p>
 
               <div className="relative mt-10 flex flex-wrap justify-center gap-3">
-                <Link
-                  href="/calendar"
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    const r = e.currentTarget.getBoundingClientRect();
+                    trigger("/calendar", { x: r.left + r.width / 2, y: r.top + r.height / 2 });
+                  }}
                   className="group inline-flex items-center gap-2 rounded-full pl-6 pr-2 py-2.5 text-[16px] font-medium transition-transform duration-200 active:scale-[0.97]"
                   style={{
                     background: "linear-gradient(180deg, hsl(36 30% 98%), hsl(36 22% 92%))",
@@ -84,7 +89,7 @@ export function FinalCta() {
                       <polyline points="9 7 17 7 17 15" />
                     </svg>
                   </span>
-                </Link>
+                </button>
               </div>
             </div>
           </div>

@@ -15,6 +15,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useRef, useEffect } from "react";
+import { usePageTransition } from "@/context/TransitionContext";
 
 const EASE_OUT_QUART: [number, number, number, number] = [0.165, 0.84, 0.44, 1];
 
@@ -137,9 +138,14 @@ function WordReveal({ words, baseDelay }: { words: string[]; baseDelay: number }
 
 /* ─── Primary CTA — button-in-button architecture ────────────────── */
 function PrimaryCta({ href, children }: { href: string; children: string }) {
+  const { trigger } = usePageTransition();
   return (
-    <Link
-      href={href}
+    <button
+      type="button"
+      onClick={(e) => {
+        const r = e.currentTarget.getBoundingClientRect();
+        trigger(href, { x: r.left + r.width / 2, y: r.top + r.height / 2 });
+      }}
       className="group relative inline-flex items-center gap-2 rounded-full pl-5 pr-2 py-2 text-[15px] font-medium transition-transform duration-200 active:scale-[0.97]"
       style={{
         background: "linear-gradient(180deg, hsl(36 28% 98%), hsl(36 20% 92%))",
@@ -161,7 +167,7 @@ function PrimaryCta({ href, children }: { href: string; children: string }) {
           <polyline points="9 7 17 7 17 15" />
         </svg>
       </span>
-    </Link>
+    </button>
   );
 }
 

@@ -7,6 +7,8 @@ import { CosmeticsProvider } from "@/components/CosmeticsProvider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import PersistenceBootstrap from "@/components/PersistenceBootstrap";
+import { PageTransitionProvider } from "@/context/TransitionContext";
+import { PageTransitionOverlay } from "@/components/PageTransitionOverlay";
 
 /**
  * Standalone-mode providers.
@@ -63,15 +65,18 @@ export function Providers({ children }: { children: React.ReactNode }) {
       disableTransitionOnChange
       storageKey="lumina-theme"
     >
-      <LuminaAuthProvider>
-        <CosmeticsProvider>
-          <TooltipProvider delayDuration={400}>
-            <PersistenceBootstrap />
-            {children}
-            <Toaster />
-          </TooltipProvider>
-        </CosmeticsProvider>
-      </LuminaAuthProvider>
+      <PageTransitionProvider>
+        <LuminaAuthProvider>
+          <CosmeticsProvider>
+            <TooltipProvider delayDuration={400}>
+              <PersistenceBootstrap />
+              {children}
+              <PageTransitionOverlay />
+              <Toaster />
+            </TooltipProvider>
+          </CosmeticsProvider>
+        </LuminaAuthProvider>
+      </PageTransitionProvider>
     </ThemeProvider>
   );
 }
