@@ -2,7 +2,7 @@
 
 A keyboard-first, beautifully animated calendar component for React. Month / Week / Day views, drag-and-drop, recurring events (RFC 5545), Google / Outlook / Apple Calendar overlays, conflict detection, and localStorage persistence — all in one package.
 
-Built with **React 18/19**, **Zustand**, **date-fns**, **Tailwind CSS**, and **Framer Motion**.
+Built with **React 18/19**, **Zustand**, **date-fns**, and **Tailwind CSS**.
 
 ---
 
