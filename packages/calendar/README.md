@@ -307,9 +307,9 @@ const adapter = new LocalStorageAdapter('my_app_events');
 
 ---
 
-## Google & Outlook Integrations (Built-in)
+## Built-in Integrations (Google, Outlook, Apple)
 
-Just provide your API credentials and the package handles OAuth + event fetching automatically. No backend needed.
+Provide your API credentials and the package handles OAuth + event fetching automatically.
 
 ```tsx
 <BahrawyCalendarProvider
@@ -322,29 +322,70 @@ Just provide your API credentials and the package handles OAuth + event fetching
       clientId: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
       tenantId: 'common',
     },
+    apple: {
+      proxyUrl: '/api/apple-calendar',  // your server route
+    },
   }}
 >
 ```
 
 ### Setup
 
-**Google Calendar:**
+**Google Calendar** (client-side, no backend):
 1. Go to [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
 2. Create an OAuth 2.0 Client ID (Web application type)
 3. Add your domain to **Authorized JavaScript origins**
 4. Enable the **Google Calendar API** in your project
 5. Pass the `clientId` (and optionally `apiKey`) to the integration config
 
-**Outlook Calendar:**
+**Outlook Calendar** (client-side, no backend):
 1. Go to [Azure Portal](https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps)
 2. Register a new application (Single-page application)
 3. Add your domain as a **Redirect URI**
 4. Under API permissions, add **Microsoft Graph → Calendars.Read**
 5. Pass the `clientId` and optionally the `tenantId`
 
+**Apple Calendar** (needs a small server route — CalDAV can't run in the browser):
+1. Go to [appleid.apple.com](https://appleid.apple.com) → **Sign-In and Security** → **App-Specific Passwords**
+2. Users generate an app-specific password (no API keys for you to manage)
+3. Create a server route using the provided utility (see below)
+4. Pass the `proxyUrl` to the integration config
+
+#### Apple Calendar Server Route
+
+The package provides a drop-in request handler. Just create one API route:
+
+**Next.js App Router:**
+```ts
+// app/api/apple-calendar/route.ts
+import { handleAppleCalendarRequest } from 'bahrawy-calendar/apple';
+
+export async function POST(req: Request) {
+  return handleAppleCalendarRequest(req);
+}
+```
+
+**Express:**
+```ts
+import { handleAppleCalendarRequest } from 'bahrawy-calendar/apple';
+
+app.post('/api/apple-calendar', async (req, res) => {
+  const request = new Request('http://localhost', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(req.body),
+  });
+  const response = await handleAppleCalendarRequest(request);
+  const data = await response.json();
+  res.status(response.status).json(data);
+});
+```
+
+That's it — the handler validates credentials, discovers calendars, and fetches events automatically.
+
 ### Connect / Disconnect
 
-The provider exposes methods via context to trigger the OAuth popup:
+The provider exposes methods via context:
 
 ```tsx
 import { useCalendarContext } from 'bahrawy-calendar';
@@ -373,6 +414,21 @@ function IntegrationButtons() {
       {integrations.isOutlookConnected && (
         <button onClick={integrations.disconnectOutlook}>Disconnect Outlook</button>
       )}
+
+      {/* Apple uses email + app-specific password instead of OAuth */}
+      {integrations.connectApple && !integrations.isAppleConnected && (
+        <button onClick={() => {
+          const email = prompt('Apple ID email:');
+          const password = prompt('App-specific password:');
+          if (email && password) integrations.connectApple!(email, password);
+        }}>
+          Connect Apple Calendar
+        </button>
+      )}
+
+      {integrations.isAppleConnected && (
+        <button onClick={integrations.disconnectApple}>Disconnect Apple</button>
+      )}
     </div>
   );
 }
@@ -380,12 +436,19 @@ function IntegrationButtons() {
 
 ### How It Works
 
+**Google & Outlook (client-side OAuth):**
 1. User clicks "Connect" → OAuth popup opens
 2. User grants calendar read access
 3. Token is stored in `localStorage` (persists across sessions)
 4. Events are fetched from Google Calendar API / Microsoft Graph
-5. Events appear as read-only overlays alongside local events
-6. On next page load, events auto-refresh if the token is still valid
+
+**Apple Calendar (CalDAV via proxy):**
+1. User enters Apple ID email + app-specific password
+2. Credentials are validated via your server proxy → iCloud CalDAV
+3. Credentials stored in `localStorage` (persists across sessions)
+4. Events fetched from all iCloud calendars via the proxy
+
+**All providers:** Events appear as read-only overlays alongside local events. On next page load, events auto-refresh if credentials are still valid.
 
 ### Integration Config
 
@@ -397,10 +460,11 @@ function IntegrationButtons() {
 | **Outlook** | `clientId` | Yes | Application (client) ID |
 | **Outlook** | `tenantId` | No | Tenant ID (default: `common` — any account) |
 | **Outlook** | `scopes` | No | Custom scopes (default: `Calendars.Read`) |
+| **Apple** | `proxyUrl` | Yes | Your server API route that proxies CalDAV requests |
 
 ### Manual External Events
 
-You can still pass pre-fetched events manually (e.g., Apple Calendar via CalDAV, or your own backend):
+You can still pass pre-fetched events manually alongside the built-in integrations:
 
 ```tsx
 <BahrawyCalendarProvider

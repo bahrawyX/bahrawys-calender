@@ -109,6 +109,7 @@ export type { CalendarThemeTokens } from './theme/tokens';
 export type {
   GoogleConfig,
   OutlookConfig,
+  AppleConfig,
   IntegrationsConfig,
   IntegrationsContextValue,
 } from './integrations';

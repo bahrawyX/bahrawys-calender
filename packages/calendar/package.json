@@ -1,6 +1,6 @@
 {
   "name": "bahrawy-calendar",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A keyboard-first, beautifully animated calendar component for React. Provider integrations, recurrence engine, drag-and-drop, conflict detection — all in one package.",
   "author": "Bahrawy <bahrawyX@github.com>",
   "license": "MIT",
@@ -16,6 +16,8 @@
     "recurrence",
     "google-calendar",
     "outlook",
+    "apple-calendar",
+    "caldav",
     "zustand",
     "tailwind"
   ],
@@ -38,6 +40,11 @@
       "types": "./dist/compat/index.d.ts",
       "import": "./dist/compat/index.js",
       "require": "./dist/compat/index.cjs"
+    },
+    "./apple": {
+      "types": "./dist/apple/index.d.ts",
+      "import": "./dist/apple/index.js",
+      "require": "./dist/apple/index.cjs"
     }
   },
   "files": [

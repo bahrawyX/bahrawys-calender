@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * useIntegrations — handles Google Calendar + Outlook OAuth flows and event fetching.
+ * useIntegrations — handles Google Calendar, Outlook, and Apple Calendar integration.
  *
  * Loads auth libraries lazily from CDN (zero bundle-size cost if unused).
  * Tokens are persisted in localStorage so users stay connected across sessions.
@@ -9,11 +9,12 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type { CalendarEvent } from '../types';
-import type { IntegrationsConfig, IntegrationsContextValue, IntegrationState } from './types';
+import type { IntegrationsConfig, IntegrationsContextValue, IntegrationState, AppleCredentialState } from './types';
 
 // ── Storage keys ───────────────────────────────────────────────────────────
 const GOOGLE_TOKEN_KEY = 'bahrawy_google_token';
 const OUTLOOK_TOKEN_KEY = 'bahrawy_outlook_token';
+const APPLE_CREDS_KEY = 'bahrawy_apple_creds';
 
 // ── Script loading ─────────────────────────────────────────────────────────
 
@@ -239,6 +240,72 @@ async function fetchOutlookEvents(accessToken: string): Promise<CalendarEvent[]>
   return items.map(outlookEventToCalendar).filter(Boolean) as CalendarEvent[];
 }
 
+// ── Apple fetch (via proxy) ────────────────────────────────────────────────
+
+async function fetchAppleEventsViaProxy(
+  proxyUrl: string,
+  creds: AppleCredentialState,
+): Promise<CalendarEvent[]> {
+  const { timeMin, timeMax } = getDateRange();
+
+  const res = await fetch(proxyUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'fetch-events',
+      email: creds.email,
+      appPassword: creds.appPassword,
+      startDate: timeMin.split('T')[0],
+      endDate: timeMax.split('T')[0],
+    }),
+  });
+
+  if (!res.ok) {
+    if (res.status === 401) throw new Error('APPLE_INVALID_CREDS');
+    throw new Error(`Apple proxy error: ${res.status}`);
+  }
+
+  const data = await res.json();
+  return (data.events ?? []) as CalendarEvent[];
+}
+
+async function validateAppleViaProxy(
+  proxyUrl: string,
+  email: string,
+  appPassword: string,
+): Promise<void> {
+  const res = await fetch(proxyUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'connect', email, appPassword }),
+  });
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error ?? `Apple connection failed: ${res.status}`);
+  }
+}
+
+function saveAppleCreds(creds: AppleCredentialState): void {
+  try {
+    localStorage.setItem(APPLE_CREDS_KEY, JSON.stringify(creds));
+  } catch { /* quota */ }
+}
+
+function loadAppleCreds(): AppleCredentialState | null {
+  try {
+    const raw = localStorage.getItem(APPLE_CREDS_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as AppleCredentialState;
+  } catch {
+    return null;
+  }
+}
+
+function clearAppleCreds(): void {
+  try { localStorage.removeItem(APPLE_CREDS_KEY); } catch { /* ok */ }
+}
+
 // ── Main hook ──────────────────────────────────────────────────────────────
 
 export function useIntegrations(
@@ -246,19 +313,25 @@ export function useIntegrations(
 ): {
   googleEvents: CalendarEvent[];
   outlookEvents: CalendarEvent[];
+  appleEvents: CalendarEvent[];
   integrations: IntegrationsContextValue;
 } {
   const [googleEvents, setGoogleEvents] = useState<CalendarEvent[]>([]);
   const [outlookEvents, setOutlookEvents] = useState<CalendarEvent[]>([]);
+  const [appleEvents, setAppleEvents] = useState<CalendarEvent[]>([]);
   const [isGoogleConnected, setIsGoogleConnected] = useState(false);
   const [isOutlookConnected, setIsOutlookConnected] = useState(false);
+  const [isAppleConnected, setIsAppleConnected] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [isOutlookLoading, setIsOutlookLoading] = useState(false);
+  const [isAppleLoading, setIsAppleLoading] = useState(false);
 
   const googleConfigRef = useRef(config?.google);
   const outlookConfigRef = useRef(config?.outlook);
+  const appleConfigRef = useRef(config?.apple);
   googleConfigRef.current = config?.google;
   outlookConfigRef.current = config?.outlook;
+  appleConfigRef.current = config?.apple;
 
   // ── Google: Connect ────────────────────────────────────────────────────
 
@@ -393,7 +466,39 @@ export function useIntegrations(
     setIsOutlookConnected(false);
   }, []);
 
-  // ── Auto-fetch on mount if tokens exist ───────────────────────────────
+  // ── Apple: Connect ────────────────────────────────────────────────────
+
+  const connectApple = useCallback(async (email: string, appPassword: string) => {
+    const cfg = appleConfigRef.current;
+    if (!cfg) return;
+
+    // Validate via proxy
+    await validateAppleViaProxy(cfg.proxyUrl, email, appPassword);
+
+    // Store credentials
+    const creds: AppleCredentialState = { email, appPassword };
+    saveAppleCreds(creds);
+    setIsAppleConnected(true);
+
+    // Fetch events immediately
+    try {
+      setIsAppleLoading(true);
+      const events = await fetchAppleEventsViaProxy(cfg.proxyUrl, creds);
+      setAppleEvents(events);
+    } catch {
+      // Will retry on next mount
+    } finally {
+      setIsAppleLoading(false);
+    }
+  }, []);
+
+  const disconnectApple = useCallback(() => {
+    clearAppleCreds();
+    setAppleEvents([]);
+    setIsAppleConnected(false);
+  }, []);
+
+  // ── Auto-fetch on mount if tokens/creds exist ─────────────────────────
 
   useEffect(() => {
     if (!config?.google) return;
@@ -407,7 +512,6 @@ export function useIntegrations(
     fetchGoogleEvents(token.accessToken)
       .then(setGoogleEvents)
       .catch(() => {
-        // Token expired or invalid — clear it
         clearToken(GOOGLE_TOKEN_KEY);
         setIsGoogleConnected(false);
       })
@@ -432,6 +536,24 @@ export function useIntegrations(
       .finally(() => setIsOutlookLoading(false));
   }, [config?.outlook]);
 
+  useEffect(() => {
+    if (!config?.apple) return;
+
+    const creds = loadAppleCreds();
+    if (!creds) return;
+
+    setIsAppleConnected(true);
+    setIsAppleLoading(true);
+
+    fetchAppleEventsViaProxy(config.apple.proxyUrl, creds)
+      .then(setAppleEvents)
+      .catch(() => {
+        clearAppleCreds();
+        setIsAppleConnected(false);
+      })
+      .finally(() => setIsAppleLoading(false));
+  }, [config?.apple]);
+
   // ── Build context value ───────────────────────────────────────────────
 
   const integrations: IntegrationsContextValue = {
@@ -444,7 +566,12 @@ export function useIntegrations(
     disconnectOutlook: config?.outlook ? disconnectOutlook : undefined,
     isOutlookConnected,
     isOutlookLoading,
+
+    connectApple: config?.apple ? connectApple : undefined,
+    disconnectApple: config?.apple ? disconnectApple : undefined,
+    isAppleConnected,
+    isAppleLoading,
   };
 
-  return { googleEvents, outlookEvents, integrations };
+  return { googleEvents, outlookEvents, appleEvents, integrations };
 }

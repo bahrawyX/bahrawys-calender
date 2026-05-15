@@ -6,6 +6,7 @@ export default defineConfig([
       index: 'src/index.ts',
       'theme/index': 'src/theme/index.ts',
       'compat/index': 'src/compat/index.ts',
+      'apple/index': 'src/apple/index.ts',
     },
     format: ['esm', 'cjs'],
     dts: true,

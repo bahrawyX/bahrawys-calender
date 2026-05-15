@@ -1,5 +1,5 @@
 /**
- * Integration types — config for Google Calendar and Outlook.
+ * Integration types — config for Google Calendar, Outlook, and Apple Calendar.
  */
 
 export interface GoogleConfig {
@@ -20,15 +20,34 @@ export interface OutlookConfig {
   scopes?: string[];
 }
 
+export interface AppleConfig {
+  /**
+   * Your API proxy endpoint URL. Apple CalDAV can't be called from the browser
+   * (CORS), so you need a server route that proxies requests.
+   *
+   * The package provides server utilities via `bahrawy-calendar/apple` to
+   * build this endpoint in ~10 lines of code.
+   *
+   * Example: '/api/apple-calendar'
+   */
+  proxyUrl: string;
+}
+
 export interface IntegrationsConfig {
   google?: GoogleConfig;
   outlook?: OutlookConfig;
+  apple?: AppleConfig;
 }
 
 export interface IntegrationState {
   accessToken: string;
   expiresAt: number; // timestamp ms
   refreshToken?: string;
+}
+
+export interface AppleCredentialState {
+  email: string;
+  appPassword: string;
 }
 
 export interface IntegrationsContextValue {
@@ -49,4 +68,13 @@ export interface IntegrationsContextValue {
   isOutlookConnected: boolean;
   /** Whether Outlook is currently loading events */
   isOutlookLoading: boolean;
+
+  /** Connect Apple Calendar (email + app-specific password) */
+  connectApple?: (email: string, appPassword: string) => Promise<void>;
+  /** Disconnect Apple Calendar */
+  disconnectApple?: () => void;
+  /** Whether Apple Calendar is connected */
+  isAppleConnected: boolean;
+  /** Whether Apple is currently loading events */
+  isAppleLoading: boolean;
 }

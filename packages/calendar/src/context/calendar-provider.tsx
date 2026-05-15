@@ -132,10 +132,11 @@ export function BahrawyCalendarProvider({
       .catch(() => store.getState().hydrateFromDbFailed());
   }, [persistenceAdapter]);
 
-  // Run integrations hook (handles OAuth + event fetching for Google/Outlook)
+  // Run integrations hook (handles OAuth + event fetching for Google/Outlook/Apple)
   const {
     googleEvents: integratedGoogleEvents,
     outlookEvents: integratedOutlookEvents,
+    appleEvents: integratedAppleEvents,
     integrations: integrationsValue,
   } = useIntegrations(integrationsConfig);
 
@@ -144,9 +145,9 @@ export function BahrawyCalendarProvider({
     () => ({
       google: [...(externalEventsProp?.google ?? []), ...integratedGoogleEvents],
       outlook: [...(externalEventsProp?.outlook ?? []), ...integratedOutlookEvents],
-      apple: externalEventsProp?.apple ?? [],
+      apple: [...(externalEventsProp?.apple ?? []), ...integratedAppleEvents],
     }),
-    [externalEventsProp?.google, externalEventsProp?.outlook, externalEventsProp?.apple, integratedGoogleEvents, integratedOutlookEvents],
+    [externalEventsProp?.google, externalEventsProp?.outlook, externalEventsProp?.apple, integratedGoogleEvents, integratedOutlookEvents, integratedAppleEvents],
   );
 
   const config: CalendarConfig = useMemo(
