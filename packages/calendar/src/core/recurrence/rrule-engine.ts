@@ -29,9 +29,15 @@ export async function initRecurrence(): Promise<void> {
   if (!_loadPromise) {
     _loadPromise = import('rrule')
       .then((mod) => {
-        RRule = mod.RRule;
-        RRuleSet = mod.RRuleSet;
-        rrulestr = mod.rrulestr;
+        // In Node, rrule's CJS build exposes named exports under .default
+        // (the module namespace is { __esModule: true, default: { RRule, ... } }).
+        // In browsers/bundlers the ESM entry exposes them at the top level.
+        const src = mod.default && (mod.default.RRule || mod.default.RRuleSet)
+          ? mod.default
+          : mod;
+        RRule = src.RRule;
+        RRuleSet = src.RRuleSet;
+        rrulestr = src.rrulestr;
       })
       .catch(() => {
         _loadPromise = null; // allow retry

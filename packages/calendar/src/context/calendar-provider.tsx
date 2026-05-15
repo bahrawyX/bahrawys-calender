@@ -20,7 +20,8 @@
 import React, { useContext, useEffect, useMemo, useRef } from 'react';
 import { CalendarContext } from './calendar-context';
 import type { CalendarContextValue, CalendarConfig } from './calendar-context';
-import type { CalendarEvent, NotifyFn, ViewType, CalendarLifecycleCallbacks } from '../types';
+import { ViewType } from '../types';
+import type { CalendarEvent, NotifyFn, CalendarLifecycleCallbacks } from '../types';
 import type { PersistenceAdapter } from '../core/persistence/types';
 import type { IntegrationsConfig } from '../integrations/types';
 import { useIntegrations } from '../integrations/use-integrations';
@@ -131,6 +132,87 @@ export function BahrawyCalendarProvider({
       });
     }
   }, [enableRecurrence]);
+
+  // ── Keyboard shortcuts ────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!enableKeyboardShortcuts) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Skip if user is typing in an input/textarea/contenteditable
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+      if ((e.target as HTMLElement)?.isContentEditable) return;
+
+      const store = storesRef.current!;
+      const events = eventsRef.current!;
+      const state = store.getState();
+
+      // Ctrl/Cmd + Z = Undo, Ctrl/Cmd + Shift + Z = Redo
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+        e.preventDefault();
+        if (e.shiftKey) {
+          events.getState().redo();
+        } else {
+          events.getState().undo();
+        }
+        return;
+      }
+
+      // Skip remaining shortcuts if any modifier key is held
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+      switch (e.key.toLowerCase()) {
+        case 'n':
+          e.preventDefault();
+          state.openModal();
+          break;
+        case 't':
+          e.preventDefault();
+          state.setCurrentDate(new Date());
+          break;
+        case 'm':
+          e.preventDefault();
+          state.setView(ViewType.MONTH);
+          break;
+        case 'w':
+          e.preventDefault();
+          state.setView(ViewType.WEEK);
+          break;
+        case 'd':
+          e.preventDefault();
+          state.setView(ViewType.DAY);
+          break;
+        case 'arrowleft': {
+          e.preventDefault();
+          const cur = state.currentDate;
+          const next = new Date(cur);
+          if (state.view === ViewType.MONTH) next.setMonth(next.getMonth() - 1);
+          else if (state.view === ViewType.WEEK) next.setDate(next.getDate() - 7);
+          else next.setDate(next.getDate() - 1);
+          state.setCurrentDate(next);
+          break;
+        }
+        case 'arrowright': {
+          e.preventDefault();
+          const cur = state.currentDate;
+          const next = new Date(cur);
+          if (state.view === ViewType.MONTH) next.setMonth(next.getMonth() + 1);
+          else if (state.view === ViewType.WEEK) next.setDate(next.getDate() + 7);
+          else next.setDate(next.getDate() + 1);
+          state.setCurrentDate(next);
+          break;
+        }
+        case 'escape':
+          if (state.isModalOpen) {
+            state.closeModal();
+          }
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [enableKeyboardShortcuts]);
 
   // Hydrate events from persistence on mount
   useEffect(() => {
