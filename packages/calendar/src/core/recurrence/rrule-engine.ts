@@ -2,26 +2,55 @@
  * RFC 5545 RRULE engine — powered by the `rrule` library.
  * All functions are pure and stateless.
  *
- * The `rrule` package is an optional peer dependency. If not installed,
- * functions that require it will throw a clear error message.
+ * The `rrule` package is an optional peer dependency. Call `initRecurrence()`
+ * once at startup (or use `<BahrawyCalendarProvider enableRecurrence>`)
+ * to load it before calling any recurrence functions.
  */
 
 let RRule: typeof import('rrule').RRule;
 let RRuleSet: typeof import('rrule').RRuleSet;
 let rrulestr: typeof import('rrule').rrulestr;
+let _loadPromise: Promise<void> | null = null;
+
+/**
+ * Pre-load the rrule library. Call once at app startup.
+ * BahrawyCalendarProvider calls this automatically when enableRecurrence is true.
+ *
+ * @example
+ * ```ts
+ * import { initRecurrence, buildRRule } from 'bahrawy-calendar';
+ *
+ * await initRecurrence();
+ * const rule = buildRRule({ freq: 'weekly', byDay: ['MO', 'WE', 'FR'] });
+ * ```
+ */
+export async function initRecurrence(): Promise<void> {
+  if (RRule) return;
+  if (!_loadPromise) {
+    _loadPromise = import('rrule')
+      .then((mod) => {
+        RRule = mod.RRule;
+        RRuleSet = mod.RRuleSet;
+        rrulestr = mod.rrulestr;
+      })
+      .catch(() => {
+        _loadPromise = null; // allow retry
+        throw new Error(
+          'bahrawy-calendar: The `rrule` package is required for recurrence features. ' +
+          'Install it with: npm install rrule',
+        );
+      });
+  }
+  await _loadPromise;
+}
 
 function ensureRRule() {
-  if (RRule) return;
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const mod = require('rrule');
-    RRule = mod.RRule;
-    RRuleSet = mod.RRuleSet;
-    rrulestr = mod.rrulestr;
-  } catch {
+  if (!RRule) {
     throw new Error(
-      'bahrawy-calendar: The `rrule` package is required for recurrence features. ' +
-      'Install it with: npm install rrule'
+      'bahrawy-calendar: rrule is not loaded. ' +
+      'Call `await initRecurrence()` before using recurrence functions, ' +
+      'or use <BahrawyCalendarProvider enableRecurrence>. ' +
+      'If not installed: npm install rrule',
     );
   }
 }

@@ -75,7 +75,7 @@ export interface CalendarUIState {
 
 /** Options for creating the calendar UI store. */
 export interface CreateCalendarStoreOptions {
-  defaultView?: ViewType;
+  defaultView?: ViewType | 'month' | 'week' | 'day';
   initialDate?: Date;
   callbacks?: CalendarLifecycleCallbacks;
 }

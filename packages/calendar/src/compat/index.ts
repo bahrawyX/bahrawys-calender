@@ -88,6 +88,9 @@ export type { TimeSlotId, SlotGranularity } from '../core/engine/slot-engine';
 export { uid } from '../core/utils/uid';
 export { default as notify } from '../core/utils/notify';
 
+// ── Recurrence ─────────────────────────────────────────────────────────────
+export { initRecurrence } from '../core/recurrence/rrule-engine';
+
 // ── Hooks ───────────────────────────────────────────────────────────────────
 export { useCalendar } from '../core/hooks/use-calendar';
 export { useTimelineConflict } from '../core/hooks/use-timeline-conflict';

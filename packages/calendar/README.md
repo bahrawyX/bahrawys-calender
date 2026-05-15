@@ -27,11 +27,35 @@ npm install rrule
 | date-fns | ^3.0.0 \|\| ^4.0.0 |
 | rrule *(optional)* | ^2.7.0 |
 
-> **UI template dependency:** The scaffolded components (copied via CLI) also use `framer-motion` for animations. Install it when you scaffold: `npm install framer-motion`.
+> **Note:** The built-in `<BahrawyCalendar />` component uses inline styles and has zero additional dependencies beyond the peer deps above. If you build custom views with the headless stores, you can style them however you want.
 
 ---
 
 ## Quick Start
+
+### Option 1: Drop-in Component
+
+The simplest way — renders a full calendar with Month/Week/Day views out of the box:
+
+```tsx
+import { BahrawyCalendar } from 'bahrawy-calendar';
+
+export default function App() {
+  return (
+    <BahrawyCalendar
+      defaultView="week"
+      enableRecurrence
+      callbacks={{
+        onEventDeleted: (event) => console.log('Deleted:', event.id),
+      }}
+    />
+  );
+}
+```
+
+### Option 2: Provider + Custom UI
+
+For full control, use the provider and build your own views with the stores:
 
 ```tsx
 import { BahrawyCalendarProvider, useCalendarContext } from 'bahrawy-calendar';
@@ -58,7 +82,7 @@ function MyCalendar() {
 }
 ```
 
-That's it — the provider creates the Zustand stores, hydrates events from `localStorage`, and exposes everything via context.
+Both options create Zustand stores, hydrate events from `localStorage`, and expose everything via context.
 
 ---
 
@@ -71,69 +95,7 @@ bahrawy-calendar/theme   → CSS variable tokens and Tailwind classes
 bahrawy-calendar/apple   → Server-side Apple CalDAV utilities (Node.js only)
 ```
 
-The package ships the **core logic** (stores, engines, persistence, recurrence). The **UI components** (MonthView, WeekView, DayView, EventModal, etc.) are copied into your project using the CLI — shadcn/ui style. This gives you full control over markup and styling.
-
----
-
-## Scaffolding UI Components (CLI)
-
-UI view components are not bundled in the npm package. Instead, use the CLI to copy them into your project:
-
-```bash
-# Scaffold everything at once
-npx bahrawy-calendar-cli init
-
-# Or add individual components
-npx bahrawy-calendar-cli add week-view
-npx bahrawy-calendar-cli add month-view
-npx bahrawy-calendar-cli add day-view
-npx bahrawy-calendar-cli add event-modal
-
-# See all available components
-npx bahrawy-calendar-cli list
-```
-
-### CLI Options
-
-```bash
-npx bahrawy-calendar-cli init --dest src/components/calendar
-npx bahrawy-calendar-cli add week-view --dest src/components/calendar --overwrite
-```
-
-| Flag | Default | Description |
-|------|---------|-------------|
-| `-d, --dest <path>` | `components/bahrawy-calendar` | Where to copy component files |
-| `--overwrite` | `false` | Replace existing files |
-
-### Available Components
-
-| Component | Description |
-|-----------|-------------|
-| `bahrawy-calendar` | Root `<BahrawyCalendar />` wrapper |
-| `week-view` | 7-day time grid with drag-and-drop |
-| `month-view` | 6-week grid with overflow popovers |
-| `day-view` | Single-day time grid with timeline |
-| `event-modal` | Create/edit dialog with recurrence and categories |
-| `time-grid-event` | Positioned event card for Week/Day views |
-| `event-item` | Event pill for Month view |
-| `drag-ghost` | Drag preview overlay with FLIP animation |
-| `hover-indicator` | Time hover line indicator |
-| `time-slot-cell` | Clickable hour-slot cell |
-| `calendar-shared` | Shared CSS token classes |
-| `conflict-dialog` | Conflict detection prompt dialog |
-| `conflict-sheet` | Conflict detail sheet with event list |
-| `conflict-hook` | Timeline conflict detection hook |
-| `visible-events` | Virtualized event filtering utility |
-| `virtualization` | Virtual time range + density overflow |
-| `recurrence-selector` | Recurrence rule builder UI |
-| `edit-recurrence-dialog` | Edit/delete scope dialog for recurring events |
-| `date-picker` | Date picker |
-| `time-picker` | Time picker with hour/minute selectors |
-| `day-timeline` | Shared scrollable day timeline |
-| `event-provider-badge` | Provider brand badge (Google/Outlook/Apple) |
-| `icons` | All calendar icon components |
-
-The CLI resolves transitive dependencies automatically — adding `week-view` also copies `time-grid-event`, `drag-ghost`, `hover-indicator`, `calendar-shared`, `conflict-hook`, `conflict-dialog`, `conflict-sheet`, `virtualization`, `visible-events`, and `icons`.
+The package ships **everything you need out of the box**: built-in Month/Week/Day views via `<BahrawyCalendar />`, plus the core logic (stores, engines, persistence, recurrence) as headless building blocks if you want full control over the UI.
 
 ---
 
@@ -540,8 +502,15 @@ Available tokens: `container`, `header`, `weekdayLabel`, `timeLabel`, `timeSideb
 
 Full RFC 5545 RRULE support (requires the optional `rrule` peer dependency):
 
+```bash
+npm install rrule
+```
+
+The rrule library is loaded asynchronously. If you use `<BahrawyCalendarProvider>` or `<BahrawyCalendar>`, it's initialized automatically when `enableRecurrence` is `true` (the default). For standalone usage, call `initRecurrence()` first:
+
 ```tsx
 import {
+  initRecurrence,
   expandRecurrence,
   buildRRule,
   describeRRule,
@@ -549,22 +518,24 @@ import {
   getNextOccurrences,
 } from 'bahrawy-calendar';
 
+// Initialize once at app startup
+await initRecurrence();
+
 // Build an RRULE string
-const rrule = buildRRule({
-  frequency: 'WEEKLY',
-  interval: 1,
-  daysOfWeek: [1, 3, 5],  // Mon, Wed, Fri
-  endCondition: { type: 'COUNT', count: 10 },
+const rule = buildRRule({
+  freq: 'weekly',
+  byDay: ['MO', 'WE', 'FR'],
+  count: 10,
 });
 
 // Human-readable description
-describeRRule(rrule); // "Every week on Mon, Wed, Fri, 10 times"
+describeRRule(rule, new Date()); // "every week on Monday, Wednesday, Friday, 10 times"
 
 // Expand occurrences in a date range
-const instances = expandRecurrence(event, '2025-01-01', '2025-03-31');
+const instances = expandRecurrence(input, rangeStart, rangeEnd, durationMs);
 
 // Get next 5 occurrences from today
-const upcoming = getNextOccurrences(event, 5);
+const upcoming = getNextOccurrences(input, new Date(), 5, durationMs);
 ```
 
 ---
@@ -780,53 +751,17 @@ const dragStore = createDragStore(() => eventsStore.getState());
 
 ---
 
-## Template Components (Compat Layer)
+## Compat Layer
 
-The scaffolded UI templates import from `bahrawy-calendar/compat` — a convenience re-export that maps all stores, utils, engines, and constants under a single import:
+The `bahrawy-calendar/compat` entry point provides convenience re-exports for migration scenarios or custom view components:
 
 ```tsx
-// Inside a scaffolded template component
 import { useCalendarStore, useCalendarEventsStore, useDragStore } from 'bahrawy-calendar/compat';
 import { timeToMinutes, HOUR_HEIGHT, hourLabel, makeSlotKey } from 'bahrawy-calendar/compat';
 import { EVENT_COLORS, CATEGORIES } from 'bahrawy-calendar/compat';
 ```
 
-You don't need to use the compat layer in your own code — it exists to keep the template components concise. For new code, prefer importing directly from `bahrawy-calendar`.
-
----
-
-## Performance
-
-- **Virtualized time ranges**: Only visible hours are rendered in Week/Day views
-- **Density guards**: When event count exceeds 200, compact mode activates automatically (column capping, overflow indicators)
-- **Memoized overlap calculations**: `calculateOverlaps` is cached per render cycle
-- **Debug overlay**: Enable `window.__BAHRAWY_PERF_DEBUG__ = true` in console to see real-time render stats, FPS, and DOM node counts
-
----
-
-## shadcn/ui Dependencies
-
-The scaffolded UI components use these shadcn/ui primitives. Install them before using the templates:
-
-```bash
-npx shadcn@latest add dialog button input textarea label select separator popover scroll-area tooltip sheet calendar
-```
-
-Required per component:
-
-| Component | shadcn deps |
-|-----------|-------------|
-| `week-view` | scroll-area, tooltip |
-| `month-view` | popover, scroll-area |
-| `day-view` | scroll-area, tooltip |
-| `event-modal` | dialog, input, textarea, label, select, button, separator |
-| `time-grid-event` | tooltip |
-| `conflict-dialog` | dialog, button |
-| `conflict-sheet` | sheet, scroll-area, button |
-| `virtualization` | popover, scroll-area |
-| `recurrence-selector` | select, input, label |
-| `date-picker` | popover, calendar, button |
-| `time-picker` | select |
+For new code, prefer importing directly from `bahrawy-calendar`.
 
 ---
 

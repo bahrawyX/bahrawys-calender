@@ -9,7 +9,6 @@
 export type {
   CalendarEvent,
   EventInstance,
-  ViewType,
   RecurrenceRule,
   EditScope,
   EventCategory,
@@ -22,6 +21,10 @@ export type {
   NotifyFn,
   CalendarLifecycleCallbacks,
 } from './types';
+// ViewType is both a type and a runtime enum value — export it as a value so
+// consumers can use ViewType.MONTH etc. at runtime (not just in type positions).
+export { ViewType } from './types';
+// Backwards-compatible alias
 export { ViewType as ViewTypeEnum } from './types';
 
 // ── Constants ───────────────────────────────────────────────────────────────
@@ -72,6 +75,7 @@ export type { DragCollisionResult } from './core/engine/drag-engine';
 
 // ── Recurrence ──────────────────────────────────────────────────────────────
 export {
+  initRecurrence,
   expandRecurrence,
   buildRRule,
   describeRRule,

@@ -18,8 +18,21 @@ function persistCustomCategories(list: Array<{ name: string; color: string }>): 
   setStorageItem(CUSTOM_CATEGORIES_KEY, JSON.stringify(list));
 }
 
+const VIEW_STRING_MAP: Record<string, ViewType> = {
+  month: ViewType.MONTH,
+  week: ViewType.WEEK,
+  day: ViewType.DAY,
+};
+
+function normalizeViewType(v: ViewType | 'month' | 'week' | 'day' | undefined): ViewType {
+  if (v === undefined) return ViewType.MONTH;
+  if (typeof v === 'string' && v in VIEW_STRING_MAP) return VIEW_STRING_MAP[v];
+  return v as ViewType;
+}
+
 export function createCalendarStore(options: CreateCalendarStoreOptions = {}) {
-  const { defaultView = ViewType.MONTH, initialDate, callbacks } = options;
+  const { defaultView: rawView, initialDate, callbacks } = options;
+  const defaultView = normalizeViewType(rawView);
 
   return create<CalendarUIState>((set, get) => ({
     view: defaultView,

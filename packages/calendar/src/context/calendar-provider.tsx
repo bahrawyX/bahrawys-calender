@@ -25,6 +25,7 @@ import type { PersistenceAdapter } from '../core/persistence/types';
 import type { IntegrationsConfig } from '../integrations/types';
 import { useIntegrations } from '../integrations/use-integrations';
 import { LocalStorageAdapter } from '../core/persistence/local-storage-adapter';
+import { initRecurrence } from '../core/recurrence/rrule-engine';
 import { createEventsStore } from '../core/store/events-store';
 import { createCalendarStore } from '../core/store/calendar-store';
 import { createDragStore } from '../core/store/drag-store';
@@ -44,8 +45,8 @@ export interface BahrawyCalendarProviderProps {
   /** Notification function (e.g. Sonner's toast). Default: no-op */
   notify?: NotifyFn;
 
-  /** Default view on mount */
-  defaultView?: ViewType;
+  /** Default view on mount (enum or string: 'month' | 'week' | 'day') */
+  defaultView?: ViewType | 'month' | 'week' | 'day';
 
   /** Initial date on mount */
   initialDate?: Date;
@@ -120,6 +121,16 @@ export function BahrawyCalendarProvider({
     setNotifyFn(notifyFn);
     __setStores(storesRef.current!, eventsRef.current!, dragRef.current!);
   }, [notifyFn]);
+
+  // Auto-load rrule when recurrence is enabled
+  useEffect(() => {
+    if (enableRecurrence) {
+      initRecurrence().catch(() => {
+        // Silently ignore — rrule is an optional peer dep.
+        // Users will get a clear error if they call a recurrence function without it.
+      });
+    }
+  }, [enableRecurrence]);
 
   // Hydrate events from persistence on mount
   useEffect(() => {
