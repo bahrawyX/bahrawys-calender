@@ -105,6 +105,15 @@ export { uid } from './core/utils/uid';
 export { defaultThemeTokens, themeTokensToCSS, cal } from './theme/tokens';
 export type { CalendarThemeTokens } from './theme/tokens';
 
+// ── Integrations ───────────────────────────────────────────────────────────
+export type {
+  GoogleConfig,
+  OutlookConfig,
+  IntegrationsConfig,
+  IntegrationsContextValue,
+} from './integrations';
+export { useIntegrations } from './integrations';
+
 // ── Root Component ──────────────────────────────────────────────────────────
 export { BahrawyCalendar } from './components/BahrawyCalendar';
 export type { BahrawyCalendarProps } from './components/BahrawyCalendar';

@@ -7,6 +7,7 @@ import type { StoreApi, UseBoundStore } from 'zustand';
 import type { CalendarEventsState, CalendarUIState, DragStoreState } from '../core/store/types';
 import type { PersistenceAdapter } from '../core/persistence/types';
 import type { NotifyFn, CalendarEvent, CalendarLifecycleCallbacks, ViewType } from '../types';
+import type { IntegrationsContextValue } from '../integrations/types';
 
 export interface CalendarConfig {
   /** Persistence backend. Default: LocalStorageAdapter */
@@ -46,6 +47,9 @@ export interface CalendarContextValue {
     outlook: CalendarEvent[];
     apple: CalendarEvent[];
   };
+
+  /** Integration methods (connect/disconnect Google, Outlook) */
+  integrations: IntegrationsContextValue;
 }
 
 export const CalendarContext = createContext<CalendarContextValue | null>(null);

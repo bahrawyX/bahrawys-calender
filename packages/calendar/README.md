@@ -170,6 +170,18 @@ The CLI resolves transitive dependencies automatically — adding `week-view` al
     onCategoryRenamed: (oldName, newName) => { /* update references */ },
     onCategoryDeleted: (name) => { /* cleanup */ },
   }}
+
+  // Built-in integrations — just provide your API credentials
+  integrations={{
+    google: {
+      clientId: 'your-id.apps.googleusercontent.com',
+      apiKey: 'AIza...',  // optional
+    },
+    outlook: {
+      clientId: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
+      tenantId: 'common',  // optional, defaults to 'common'
+    },
+  }}
 >
   {children}
 </BahrawyCalendarProvider>
@@ -187,6 +199,7 @@ The CLI resolves transitive dependencies automatically — adding `week-view` al
 | `enableConflictDetection` | `boolean` | `true` | Enable conflict detection |
 | `enableKeyboardShortcuts` | `boolean` | `true` | Enable keyboard shortcuts |
 | `callbacks` | `CalendarLifecycleCallbacks` | `undefined` | Cross-feature hooks |
+| `integrations` | `IntegrationsConfig` | `undefined` | Google/Outlook OAuth config |
 
 ---
 
@@ -294,23 +307,109 @@ const adapter = new LocalStorageAdapter('my_app_events');
 
 ---
 
-## External Calendar Providers
+## Google & Outlook Integrations (Built-in)
 
-Overlay read-only events from Google Calendar, Outlook, or Apple Calendar:
+Just provide your API credentials and the package handles OAuth + event fetching automatically. No backend needed.
 
 ```tsx
 <BahrawyCalendarProvider
-  externalEvents={{
-    google: googleCalendarEvents,   // CalendarEvent[] from your OAuth sync
-    outlook: outlookEvents,          // CalendarEvent[] from MS Graph
-    apple: appleEvents,              // CalendarEvent[] from CalDAV
+  integrations={{
+    google: {
+      clientId: 'your-id.apps.googleusercontent.com',
+      apiKey: 'AIza...',  // optional
+    },
+    outlook: {
+      clientId: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
+      tenantId: 'common',
+    },
   }}
 >
 ```
 
-External events render alongside local events but cannot be edited or dragged. They display with provider badges (Google blue, Outlook teal, Apple gray).
+### Setup
 
-To fetch these events, implement your own OAuth / CalDAV integration and pass the normalized `CalendarEvent[]` arrays.
+**Google Calendar:**
+1. Go to [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
+2. Create an OAuth 2.0 Client ID (Web application type)
+3. Add your domain to **Authorized JavaScript origins**
+4. Enable the **Google Calendar API** in your project
+5. Pass the `clientId` (and optionally `apiKey`) to the integration config
+
+**Outlook Calendar:**
+1. Go to [Azure Portal](https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps)
+2. Register a new application (Single-page application)
+3. Add your domain as a **Redirect URI**
+4. Under API permissions, add **Microsoft Graph → Calendars.Read**
+5. Pass the `clientId` and optionally the `tenantId`
+
+### Connect / Disconnect
+
+The provider exposes methods via context to trigger the OAuth popup:
+
+```tsx
+import { useCalendarContext } from 'bahrawy-calendar';
+
+function IntegrationButtons() {
+  const { integrations } = useCalendarContext();
+
+  return (
+    <div>
+      {integrations.connectGoogle && (
+        <button onClick={integrations.connectGoogle} disabled={integrations.isGoogleConnected}>
+          {integrations.isGoogleConnected ? 'Google Connected' : 'Connect Google Calendar'}
+        </button>
+      )}
+
+      {integrations.connectOutlook && (
+        <button onClick={integrations.connectOutlook} disabled={integrations.isOutlookConnected}>
+          {integrations.isOutlookConnected ? 'Outlook Connected' : 'Connect Outlook'}
+        </button>
+      )}
+
+      {integrations.isGoogleConnected && (
+        <button onClick={integrations.disconnectGoogle}>Disconnect Google</button>
+      )}
+
+      {integrations.isOutlookConnected && (
+        <button onClick={integrations.disconnectOutlook}>Disconnect Outlook</button>
+      )}
+    </div>
+  );
+}
+```
+
+### How It Works
+
+1. User clicks "Connect" → OAuth popup opens
+2. User grants calendar read access
+3. Token is stored in `localStorage` (persists across sessions)
+4. Events are fetched from Google Calendar API / Microsoft Graph
+5. Events appear as read-only overlays alongside local events
+6. On next page load, events auto-refresh if the token is still valid
+
+### Integration Config
+
+| Provider | Field | Required | Description |
+|----------|-------|----------|-------------|
+| **Google** | `clientId` | Yes | OAuth 2.0 Client ID |
+| **Google** | `apiKey` | No | API key (optional, OAuth alone is sufficient) |
+| **Google** | `scopes` | No | Custom scopes (default: `calendar.readonly`) |
+| **Outlook** | `clientId` | Yes | Application (client) ID |
+| **Outlook** | `tenantId` | No | Tenant ID (default: `common` — any account) |
+| **Outlook** | `scopes` | No | Custom scopes (default: `Calendars.Read`) |
+
+### Manual External Events
+
+You can still pass pre-fetched events manually (e.g., Apple Calendar via CalDAV, or your own backend):
+
+```tsx
+<BahrawyCalendarProvider
+  externalEvents={{
+    apple: appleEvents,       // CalendarEvent[] you fetched yourself
+    google: extraGoogleEvents, // merged with integration-fetched events
+  }}
+>
+```
 
 ---
 
