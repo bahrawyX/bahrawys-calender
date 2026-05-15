@@ -27,6 +27,8 @@ npm install rrule
 | date-fns | ^3.0.0 \|\| ^4.0.0 |
 | rrule *(optional)* | ^2.7.0 |
 
+> **UI template dependency:** The scaffolded components (copied via CLI) also use `framer-motion` for animations. Install it when you scaffold: `npm install framer-motion`.
+
 ---
 
 ## Quick Start
@@ -66,6 +68,7 @@ That's it — the provider creates the Zustand stores, hydrates events from `loc
 bahrawy-calendar         → Types, context, stores, engines, utils
 bahrawy-calendar/compat  → Compat layer for UI template components
 bahrawy-calendar/theme   → CSS variable tokens and Tailwind classes
+bahrawy-calendar/apple   → Server-side Apple CalDAV utilities (Node.js only)
 ```
 
 The package ships the **core logic** (stores, engines, persistence, recurrence). The **UI components** (MonthView, WeekView, DayView, EventModal, etc.) are copied into your project using the CLI — shadcn/ui style. This gives you full control over markup and styling.
@@ -181,6 +184,9 @@ The CLI resolves transitive dependencies automatically — adding `week-view` al
       clientId: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
       tenantId: 'common',  // optional, defaults to 'common'
     },
+    apple: {
+      proxyUrl: '/api/apple-calendar',  // your server route
+    },
   }}
 >
   {children}
@@ -199,7 +205,7 @@ The CLI resolves transitive dependencies automatically — adding `week-view` al
 | `enableConflictDetection` | `boolean` | `true` | Enable conflict detection |
 | `enableKeyboardShortcuts` | `boolean` | `true` | Enable keyboard shortcuts |
 | `callbacks` | `CalendarLifecycleCallbacks` | `undefined` | Cross-feature hooks |
-| `integrations` | `IntegrationsConfig` | `undefined` | Google/Outlook OAuth config |
+| `integrations` | `IntegrationsConfig` | `undefined` | Google/Outlook/Apple calendar config |
 
 ---
 
