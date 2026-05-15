@@ -1,0 +1,75 @@
+{
+  "name": "bahrawy-calendar",
+  "version": "0.1.0",
+  "description": "A keyboard-first, beautifully animated calendar component for React. Provider integrations, recurrence engine, drag-and-drop, conflict detection — all in one package.",
+  "author": "Bahrawy <bahrawyX@github.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bahrawyX/bahrawys-calender"
+  },
+  "keywords": [
+    "calendar",
+    "react",
+    "shadcn",
+    "drag-and-drop",
+    "recurrence",
+    "google-calendar",
+    "outlook",
+    "zustand",
+    "tailwind"
+  ],
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./theme": {
+      "types": "./dist/theme/index.d.ts",
+      "import": "./dist/theme/index.js",
+      "require": "./dist/theme/index.cjs"
+    },
+    "./compat": {
+      "types": "./dist/compat/index.d.ts",
+      "import": "./dist/compat/index.js",
+      "require": "./dist/compat/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "clean": "rimraf dist"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0",
+    "zustand": "^4.5.0 || ^5.0.0",
+    "date-fns": "^3.0.0 || ^4.0.0",
+    "rrule": "^2.7.0"
+  },
+  "peerDependenciesMeta": {
+    "rrule": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.5.0",
+    "rimraf": "^5.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "zustand": "^5.0.0",
+    "date-fns": "^4.0.0",
+    "rrule": "^2.8.1"
+  }
+}

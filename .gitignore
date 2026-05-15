@@ -16,3 +16,7 @@ next-env.d.ts
 .claude
 skills-lock.json
 tsconfig.tsbuildinfo
+
+# Package builds — tracked via npm publish, not git
+packages/*/node_modules
+packages/*/dist
