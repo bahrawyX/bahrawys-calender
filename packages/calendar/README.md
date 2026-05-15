@@ -29,6 +29,18 @@ npm install rrule
 
 > **Note:** The built-in `<BahrawyCalendar />` component uses inline styles and has zero additional dependencies beyond the peer deps above. If you build custom views with the headless stores, you can style them however you want.
 
+### shadcn/ui Registry (Recommended for shadcn projects)
+
+If you're using **shadcn/ui**, install the pre-styled calendar component with one command:
+
+```bash
+npx shadcn@latest add "https://raw.githubusercontent.com/bahrawyX/bahrawys-calender/main/registry/bahrawy-calendar.json"
+```
+
+This installs a polished `<BahrawyCalendar />` component into your `components/ui` directory that uses your existing shadcn primitives (Button, Dialog, Input, Label, ScrollArea) and Tailwind classes — fully matching your app's theme out of the box.
+
+The component still uses `bahrawy-calendar` under the hood for all core logic (stores, recurrence, persistence), so all provider props, keyboard shortcuts, and integrations work exactly the same.
+
 ---
 
 ## Quick Start
