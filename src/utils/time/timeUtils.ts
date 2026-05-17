@@ -4,6 +4,7 @@
  */
 
 export function timeToMinutes(time: string): number {
+  if (!time) return 0;
   const [h, m] = time.split(':').map(Number);
   if (!Number.isFinite(h) || !Number.isFinite(m)) return 0;
   return h * 60 + m;
